@@ -4,9 +4,6 @@ A comprehensive platform for ensuring reliable, trustworthy, and high-quality da
 
 ---
 
-![Soda Reconciliation GIF](https://docs.soda.io/assets/images/reconciliation.gif)
-
-
 ## What is Soda?
 
 In today's data-driven world, poor data quality leads to flawed business decisions, erodes trust, and creates costly engineering rework. Soda is an open-source, data reliability platform that enables data teams to proactively find, analyze, and resolve data issues before they have a downstream impact.
@@ -24,6 +21,9 @@ Soda empowers data teams with a suite of powerful capabilities to manage the ent
 *   🤝 **Centralized Collaboration & Incident Management**: Soda Cloud acts as your central command center. It visualizes data health over time, creates actionable 'Incidents' from failed checks, and notifies the right people on the right channels (Slack, Teams, Jira).
 
 *   📝 **Proactive Data Contracts**: Shift left and prevent bad data at the source. Implement machine-readable Data Contracts to enforce schema and quality guarantees between data producers and consumers, directly within your CI/CD pipeline.
+
+![Soda Reconciliation GIF](https://docs.soda.io/assets/images/reconciliation.gif)
+
 
 ## Who is Soda For?
 
