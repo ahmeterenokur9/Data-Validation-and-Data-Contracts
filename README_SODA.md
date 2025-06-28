@@ -73,4 +73,115 @@ Soda's execution engine can be deployed in a way that best fits your infrastruct
 * **Soda Library**: The core Python library and Command-Line Interface (CLI). Ideal for self-operated deployments—run scans from your local machine, a CI/CD runner, or a data orchestrator like Airflow.
 * **Soda Agent**: A secure, containerized version of the Soda Library. Acts as a bridge, allowing Soda Cloud to initiate scans within your private network without exposing database credentials. This underpins both Soda-hosted and self-hosted deployments, enabling a user-friendly, UI-driven experience.
 
+````markdown
+## Getting Started: Your First Data Quality Scan
+
+The fastest way to experience Soda is to run a scan on your local machine using our "Take a Sip" tutorial. This 15-minute guide will walk you through setting up Soda, running it against a sample dataset, and seeing the results.
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed on your system:
+
+* **Python** (version 3.8, 3.9, or 3.10)  
+* **Pip** (version 21.0 or greater)  
+* **(Optional) Docker Desktop**: To easily spin up a sample PostgreSQL database.
+
+### 1. Set Up Your Project
+
+First, create a project directory and a Python virtual environment. This is a best practice to keep your project dependencies isolated.
+
+```bash
+# Create and navigate to your project directory
+mkdir soda_project
+cd soda_project
+
+# Create a virtual environment
+python3 -m venv .venv
+
+# Activate the virtual environment
+# On macOS and Linux:
+source .venv/bin/activate
+# On Windows:
+# .venv\Scripts\activate
+````
+
+### 2. Install Soda
+
+Install the Soda Library package for PostgreSQL. This tutorial uses a PostgreSQL sample dataset, but Soda supports over 20 different data sources.
+
+```bash
+# Install Soda Library for PostgreSQL
+pip install soda-postgres
+```
+
+### 3. Configure Your Data Connection
+
+Create a `configuration.yml` file. This file tells Soda how to connect to your data source. For this tutorial, we will use Docker to run a sample PostgreSQL database.
+
+```bash
+# Run the sample database in Docker
+docker run \
+  --name sip-of-soda \
+  -p 5432:5432 \
+  -e POSTGRES_PASSWORD=soda \
+  sodadata/soda-adventureworks
+```
+
+Now, create the `configuration.yml` file with the following content:
+
+```yaml
+# In a new file named configuration.yml
+data_source adventureworks:
+  type: postgres
+  host: localhost
+  port: 5432
+  username: postgres
+  password: soda
+  database: postgres
+  schema: public
+```
+
+### 4. Write Your Data Quality Checks
+
+Create a `checks.yml` file. This is where you define your data quality rules using SodaCL.
+
+```yaml
+# In a new file named checks.yml
+checks for dim_customer:
+  - row_count > 0:
+      name: Dataset is not empty
+  - missing_count(last_name) = 0:
+      name: Last names must be populated
+  - duplicate_count(phone) = 0:
+      name: Phone numbers must be unique
+```
+
+### 5. Run the Scan
+
+You are now ready to run your first Soda scan! Execute the following command in your terminal:
+
+```bash
+soda scan -d adventureworks -c configuration.yml checks.yml
+```
+
+### 6. Analyze the Results
+
+The output in your terminal will show a summary of the scan, indicating which checks passed and which failed:
+
+```text
+Scan summary:
+2/3 checks PASSED:
+  dim_customer in adventureworks
+    Dataset is not empty [PASSED]
+    Last names must be populated [PASSED]
+1/3 checks FAILED:
+  dim_customer in adventureworks
+    Phone numbers must be unique [FAILED]
+      check_value: 715
+
+Oops! 1 failure. 0 warnings. 0 errors. 2 pass.
+```
+
+Congratulations! You've just run your first data quality scan and identified an issue (715 duplicate phone numbers) in your data.
+
 
