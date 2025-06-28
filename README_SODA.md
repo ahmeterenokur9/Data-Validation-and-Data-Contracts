@@ -326,4 +326,44 @@ This result provides immediate, specific feedback to the data producer. In a rea
 
 This programmatic enforcement is what makes Data Contracts a powerful tool for building a culture of data reliability.
 
+## The Command Center: Exploring the Soda Cloud UI
+
+While Soda's power lies in its flexible, code-based foundation (SodaCL and the Soda Library), its intelligence, collaboration, and governance capabilities come to life in **Soda Cloud**—the web interface that acts as the command center for your entire data quality operation.
+
+Soda Cloud transforms raw check results into actionable intelligence and fosters a culture of data reliability across the organization. It's where engineers, analysts, and data owners meet to ensure data is trustworthy.
+
+### Key Benefits & Features of Soda Cloud
+
+#### 1. Centralized Data Quality Observability
+Soda Cloud provides a "single pane of glass" to monitor the health of all your data assets.
+
+*   **Interactive Dashboards:** See at-a-glance health scores for your datasets. Drill down into specific checks and visualize metrics over time to identify trends and recurring issues.
+*   **Historical Context:** Every scan result is stored, allowing you to see how the quality of a dataset has evolved. This is crucial for understanding the impact of changes and for long-term analysis.
+*   **Anomaly Detection Insights:** Visualize anomalies that Soda's machine learning algorithms have automatically detected, helping you uncover "unknown unknowns" in your data.
+
+#### 2. Proactive Incident Management
+Soda Cloud turns a failed check from a simple log entry into a structured, manageable workflow.
+
+*   **Automated Incidents:** When a critical check fails, Soda automatically creates an "Incident." Think of this as a Jira ticket specifically for data downtime.
+*   **Triage and Ownership:** You can assign each incident to an owner, set its severity (Critical, High, etc.), and track its status (Open, In Progress, Resolved). This creates clear accountability.
+*   **Root Cause Analysis:** Once an incident is resolved, you can document the root cause, creating a knowledge base that helps prevent similar issues in the future.
+
+#### 3. Seamless Team Collaboration
+Data quality is a team sport. Soda Cloud provides the tools for your team to communicate effectively.
+
+*   **Contextual Discussions:** Leave comments, ask questions, and discuss issues directly on an Incident, a check, or a dataset. No more digging through scattered Slack messages or email threads.
+*   **@Mentions:** Bring the right stakeholders into a conversation by mentioning them, ensuring swift communication and resolution.
+
+#### 4. No-Code & Self-Serve Capabilities
+Soda Cloud empowers every member of the data team, regardless of their technical expertise.
+
+*   **No-Code Checks:** Data Analysts and other less-technical users can create their own data quality checks through an intuitive user interface, without writing any YAML. This democratizes data quality.
+*   **Guided Setup:** Connect new data sources through a simple, wizard-driven interface, especially when using the Soda-hosted Agent.
+
+#### 5. Automation and Governance
+Set up the rules of the road for your data quality operations.
+
+*   **Scheduled Scans:** Configure your quality checks to run automatically on a fixed schedule (e.g., daily at 2 AM), ensuring consistent monitoring without manual effort.
+*   **Intelligent Alerting:** Create powerful notification rules to route alerts to the right place. For example: "If a check fails in a finance dataset, notify the `#finance-data` Slack channel and create a high-priority Jira ticket."
+*   **Roles & Permissions:** Manage who can see and do what with granular, role-based access control, ensuring your data governance policies are enforced.
 
