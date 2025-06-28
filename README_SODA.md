@@ -182,6 +182,56 @@ Scan summary:
 Oops! 1 failure. 0 warnings. 0 errors. 2 pass.
 ```
 
-Congratulations! You've just run your first data quality scan and identified an issue (715 duplicate phone numbers) in your data.
+## From Reactive to Proactive: Preventing Bad Data with Data Contracts
+
+While running scans to *validate* data is powerful, the most effective data quality strategy is to *prevent* bad data from being created in the first place. This is the goal of a **Data Contract**.
+
+A Data Contract is a formal, machine-readable agreement between a **data producer** (such as a microservice or an application) and its **data consumers** (such as an analytics team). It defines the expected structure (schema) and quality standards for a dataset, ensuring that any data published adheres to these rules.
+
+Think of it as a quality guarantee, enforced automatically.
+
+### How Data Contracts Work in Soda
+
+The Data Contract process is designed to integrate seamlessly into your software development lifecycle (CI/CD):
+
+1.  **Define the Contract**: The data producer defines the contract in a `data_contract.yml` file, which lives alongside the application code in a Git repository. This file specifies both the **schema** and the **quality checks**.
+
+    ```yaml
+    # A sample data_contract.yml
+    dataset: orders
+
+    # 1. Schema Agreement: What the data should look like.
+    schema:
+      - name: order_id
+        data_type: text
+        required: true
+      - name: order_total
+        data_type: decimal
+        required: true
+      - name: customer_id
+        data_type: text
+        required: true
+
+    # 2. Quality Agreement: The standards the data must meet.
+    checks:
+      - missing_count(customer_id) = 0
+      - for each:
+          # Ensure order totals are always positive for every customer.
+          check: |
+            order_total >= 0
+    ```
+
+2.  **Enforce the Contract**: When a developer makes a change that affects the data, the CI/CD pipeline automatically triggers the `soda verify` command.
+
+3.  **Verify and Validate**: The `soda verify` command performs two critical actions:
+    *   **Schema Verification**: It compares the *actual* schema of the data produced by the code change against the schema defined in the contract.
+    *   **Quality Validation**: It runs the quality checks from the contract against the data.
+
+4.  **Provide a Verdict**:
+    *   **If both schema and quality checks pass ✅**, the CI/CD pipeline proceeds, and the changes can be merged.
+    *   **If there is any violation ❌**, `soda verify` fails, which in turn **fails the CI/CD pipeline**. This blocks the merge and prevents the bad data from ever reaching production.
+
+This "shift-left" approach ensures that data quality is a responsibility of the producer, not an afterthought for the consumer. It builds a foundation of trust and reliability directly into the development process.
+
 
 
