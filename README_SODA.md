@@ -8,7 +8,7 @@
 
 Soda's main goal is to ensure that data remains **trustworthy, complete, and usable**—especially in dynamic and large-scale environments like analytics pipelines, real-time systems, and IoT platforms.
 
-### 🔧 Key Features:
+###  Key Features:
 
 * **Data Validation & Monitoring**: Define rules to check for anomalies, missing values, freshness, duplicates, and schema changes.
 * **Data Contracts**: Formal agreements between producers and consumers about data expectations (schema, values, freshness, etc.).
@@ -18,6 +18,6 @@ Soda's main goal is to ensure that data remains **trustworthy, complete, and usa
     * **Soda Core**: A CLI-based, open-source framework for running data checks.
     * **Soda Cloud**: An optional cloud-based platform for collaboration, alerting, and dashboards.
 
-### 🧠 Why it Matters:
+###  Why it Matters:
 
 In today’s data-driven environments, especially with IoT systems generating high-volume data, maintaining data quality is essential. Soda provides the tools to **automatically catch issues** before they impact downstream applications, ensuring data reliability and trust at scale.
