@@ -1,29 +1,27 @@
-# Soda: The Data Quality and Reliability Platform
+# Soda: The End-to-End Platform for Data Quality
+
+A comprehensive platform for ensuring reliable, trustworthy, and high-quality data across your entire data stack.
 
 ---
 
-## Overview
+## What is Soda?
 
-Soda is an end-to-end data quality and reliability platform engineered for modern data teams. Its primary function is to enable organizations to systematically monitor, manage, and resolve data issues across the entire data lifecycle, from ingestion to consumption.
+In today's data-driven world, poor data quality leads to flawed business decisions, erodes trust, and creates costly engineering rework. Soda is an open-source, data reliability platform that enables data teams to proactively find, analyze, and resolve data issues before they have a downstream impact.
 
-By providing a unified framework, Soda empowers data producers and consumers to detect, analyze, and triage data quality incidents, thereby minimizing "data downtime" and fostering a culture of data trust.
-
-The platform is comprised of three core, integrated components:
-
-*   **Soda Library & CLI:** A Python-based library and command-line interface that executes data quality scans against a wide range of data sources. It serves as the core engine for running checks.
-*   **SodaCL (Soda Checks Language):** A declarative, human-readable language for defining data quality tests. Written in YAML, SodaCL allows teams to manage their data quality rules as code, enabling version control, reusability, and collaboration.
-*   **Soda Cloud:** A centralized web platform that provides observability into data health. It is used for monitoring check results over time, visualizing metrics, configuring alerts, and managing the entire lifecycle of a data quality incident.
+It provides a unified, declarative language (**SodaCL**) to define what good data looks like, directly within your engineering workflows. Soda then runs tests against your data, monitors for anomalies, and provides a central command center (**Soda Cloud**) for collaboration and incident management.
 
 ## Core Capabilities
 
-Soda provides a comprehensive suite of features designed to ensure data integrity and reliability at scale.
+Soda empowers data teams with a suite of powerful capabilities to manage the entire data quality lifecycle:
 
-*   **Declarative, Test-as-Code Approach:** Define sophisticated data quality checks using SodaCL. This approach allows tests to be version-controlled, peer-reviewed, and integrated directly into your development workflows, treating data quality with the same rigor as application code.
+*   ✅ **Comprehensive Testing & Validation**: Use the intuitive Soda Checks Language (SodaCL) to define a vast array of tests—from simple null checks and freshness validations to complex SQL-based business logic.
 
-*   **Proactive Data Contracts:** Implement and enforce Data Contracts directly within your CI/CD pipeline. By verifying data against a predefined schema and quality standards *before* it is published, Soda prevents bad data from entering your ecosystem, shifting quality assurance from a reactive to a proactive discipline.
+*   🤖 **Automated Monitoring & Anomaly Detection**: Schedule scans to run within your data pipelines (Airflow, Dagster, etc.) or on a regular basis. Leverage machine learning to automatically detect anomalies and unexpected changes in your data patterns.
 
-*   **Comprehensive Monitoring and Observability:** Go beyond simple validation. Track data quality metrics over time, automatically detect anomalies in your data patterns using machine learning, and monitor for unexpected schema changes. Soda Cloud provides a centralized dashboard for complete data health observability.
+*   🤝 **Centralized Collaboration & Incident Management**: Soda Cloud acts as your central command center. It visualizes data health over time, creates actionable 'Incidents' from failed checks, and notifies the right people on the right channels (Slack, Teams, Jira).
 
-*   **Collaborative Incident Management:** When a data quality check fails, Soda Cloud automatically creates a trackable "Incident." This allows teams to assign ownership, discuss root causes, and manage the resolution process in a structured and collaborative environment, integrated with tools like Slack, MS Teams, and Jira.
+*   📝 **Proactive Data Contracts**: Shift left and prevent bad data at the source. Implement machine-readable Data Contracts to enforce schema and quality guarantees between data producers and consumers, directly within your CI/CD pipeline.
 
-*   **Broad Connectivity and Integration:** Soda seamlessly integrates with the modern data stack. Connect to dozens of data sources, from traditional SQL databases to cloud data warehouses like Snowflake, BigQuery, and Redshift. Push alerts and incidents to your existing communication and ticketing systems.
+## Who is Soda For?
+
+Soda is built for modern data teams—including **Data Engineers, Analytics Engineers, Data Scientists, and Data Analysts**—who are committed to delivering reliable data products.
