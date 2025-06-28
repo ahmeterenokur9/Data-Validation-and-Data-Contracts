@@ -81,7 +81,7 @@ Soda's execution engine can be deployed in a way that best fits your infrastruct
 
 ## Getting Started: Your First Data Quality Scan
 
-The fastest way to experience Soda is to run a scan on your local machine using our "Take a Sip" tutorial. This 15-minute guide will walk you through setting up Soda, running it against a sample dataset, and seeing the results.
+The fastest way to experience Soda is to run a scan on your local machine using our "Take a Sip" tutorial. This guide will walk you through setting up Soda, running it against a sample dataset, and seeing the results.
 
 ### Prerequisites
 
@@ -113,6 +113,8 @@ source .venv/bin/activate
 ### 2. Install Soda
 
 Install the Soda Library package for PostgreSQL. This tutorial uses a PostgreSQL sample dataset, but Soda supports over 20 different data sources.
+
+
 
 ```bash
 # Install Soda Library for PostgreSQL
