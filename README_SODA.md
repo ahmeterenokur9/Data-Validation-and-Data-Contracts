@@ -235,6 +235,7 @@ This "shift-left" approach ensures that data quality is a responsibility of the 
 
 
 
+````markdown
 ## Practical Demo: Verifying a Data Contract Programmatically
 
 To see a Data Contract in action, you can explore our hands‑on demonstration in a Google Colab notebook. This notebook simulates a CI/CD process where a contract is verified against a live data source before the "code" is approved.
@@ -305,19 +306,26 @@ The `verify_contracts_on_agent` function performs the following automated workfl
 
 #### 4. Analyzing the Output
 
-The final output is a clear, actionable summary of the contract verification. The notebook's example output shows two failed checks:
+The final output is a clear, actionable summary of the contract verification. The notebook's example output shows the failed checks:
 
 ```text
 +-----------------+------------------------------------------+-----------+------------------------+
 | Column          | Check                                    | Outcome   | Details                |
 +=================+==========================================+===========+========================+
-| payment_method  | Must not have null values                | ❌ FAILED | missing_count: 101     |
+| payment_method  | Must not have null values                | ❌ FAILED | missing_count: 139     |
+|                 |                                          |           | row_count: 2701        |
+|                 |                                          |           | missing_percent: 5.14  |
++-----------------+------------------------------------------+-----------+------------------------+
+|                 | Valid values in all regions except North | ❌ FAILED | invalid_count: 342     |
+|                 |                                          |           | row_count: 2701        |
+|                 |                                          |           | invalid_percent: 12.66 |
 +-----------------+------------------------------------------+-----------+------------------------+
 ```
 
-This result provides immediate, specific feedback to the data producer. In a real‑world CI/CD pipeline, this **FAILED** outcome would stop the deployment, forcing the developer to fix the issue that caused `payment_method` to have null values before their changes can be approved.
+This result provides immediate, specific feedback to the data producer. In a real‑world CI/CD pipeline, any **FAILED** outcome would stop the deployment, forcing the developer to fix the issues before their changes can be approved.
 
 This programmatic enforcement is what makes Data Contracts a powerful tool for building a culture of data reliability.
 
 ```
 ```
+
