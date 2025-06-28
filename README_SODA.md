@@ -234,4 +234,90 @@ The Data Contract process is designed to integrate seamlessly into your software
 This "shift-left" approach ensures that data quality is a responsibility of the producer, not an afterthought for the consumer. It builds a foundation of trust and reliability directly into the development process.
 
 
+````markdown
+## Practical Demo: Verifying a Data Contract Programmatically
 
+To see a Data Contract in action, you can explore our hands‑on demonstration in a Google Colab notebook. This notebook simulates a CI/CD process where a contract is verified against a live data source before the "code" is approved.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1zkV_2tLJ4ohdzmKGS3LgdFDDnTNTUXew)
+
+### Breakdown of the Notebook
+
+The notebook walks through the exact steps an automated system would take to enforce a Data Contract.
+
+#### 1. Setup and Installation
+
+```python
+# Installs the core Soda engine into the environment.
+!pip install -U soda-core
+````
+
+This first step prepares the execution environment by installing the necessary Soda library.
+
+#### 2. Securely Configuring Soda Cloud
+
+```python
+import os
+
+# Creates a configuration file with your Soda Cloud API keys.
+# This allows the script to communicate with your Soda Cloud account.
+soda_cloud_config = f"""
+soda_cloud:
+  host: beta.soda.io
+  api_key_id: {os.getenv("API_KEY_ID")}
+  api_key_secret: {os.getenv("API_KEY_SECRET")}
+"""
+with open("soda-cloud.yml", "w") as f:
+    f.write(soda_cloud_config)
+```
+
+This block securely creates the `soda-cloud.yml` file, which authenticates the script and authorizes it to fetch contracts and publish results on your behalf.
+
+#### 3. Executing the Verification
+
+This is the core of the demonstration, where a single function call kicks off the entire process.
+
+```python
+from soda_core.contracts import verify_contracts_on_agent
+
+# Initiate the contract verification process
+res = verify_contracts_on_agent(
+    # Specify which dataset's contract to verify
+    dataset_identifiers=["databricks_demo/.../regional_sales"],
+
+    # Use the configuration file created earlier
+    soda_cloud_file_path="soda-cloud.yml",
+
+    # Ensure results are published back to Soda Cloud
+    publish=True
+)
+
+# Print the results of the verification
+print(res.get_logs())
+```
+
+The `verify_contracts_on_agent` function performs the following automated workflow:
+
+1. **Fetches the Contract**: Connects to Soda Cloud and retrieves the pre‑defined Data Contract for the `regional_sales` dataset.
+2. **Delegates the Scan**: Sends the contract and connection details to the appropriate Soda Agent, which is co‑located with the data.
+3. **Runs the Verification**: The Agent executes the scan, comparing the live data against the schema and quality checks defined in the contract.
+4. **Returns the Verdict**: Returns a result object containing a detailed log and a pass/fail verdict.
+
+#### 4. Analyzing the Output
+
+The final output is a clear, actionable summary of the contract verification. The notebook's example output shows two failed checks:
+
+```text
++-----------------+------------------------------------------+-----------+------------------------+
+| Column          | Check                                    | Outcome   | Details                |
++=================+==========================================+===========+========================+
+| payment_method  | Must not have null values                | ❌ FAILED | missing_count: 101     |
++-----------------+------------------------------------------+-----------+------------------------+
+```
+
+This result provides immediate, specific feedback to the data producer. In a real‑world CI/CD pipeline, this **FAILED** outcome would stop the deployment, forcing the developer to fix the issue that caused `payment_method` to have null values before their changes can be approved.
+
+This programmatic enforcement is what makes Data Contracts a powerful tool for building a culture of data reliability.
+
+```
+```
