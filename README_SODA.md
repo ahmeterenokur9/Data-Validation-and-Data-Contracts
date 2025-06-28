@@ -1,10 +1,3 @@
-Elbette, anlıyorum. Daha resmi ve bir proje dokümantasyonuna yakışır bir üslup kullanalım. Amaç, projenin yeteneklerini ve amacını net, profesyonel ve teknik bir dille açıklamaktır.
-
-İşte README dosyasının başlangıcı için resmi bir versiyon.
-
-Aşağıdaki metni README.md dosyanızın başlangıcı olarak kullanabilirsiniz.
-
-Generated markdown
 # Soda: The Data Quality and Reliability Platform
 
 ---
