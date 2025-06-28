@@ -349,6 +349,8 @@ Soda Cloud provides a "single pane of glass" to monitor the health of all your d
 *   **Drill-Down Analysis:** Navigate from a high-level dashboard directly to a specific dataset to see a detailed breakdown of all its checks. You can see which checks are passing or failing at the column level, along with their latest results.
 
     ![Dataset Health View](images/soda_analyze.jpeg)
+    ![Soda Metric Example](images/soda_metric.jpeg)
+
 
 *   **Advanced Filtering:** Use the global "Checks" page to search, sort, and filter every data quality check across all your data sources, giving you complete control and visibility.
 
