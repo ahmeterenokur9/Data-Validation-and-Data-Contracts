@@ -326,6 +326,4 @@ This result provides immediate, specific feedback to the data producer. In a rea
 
 This programmatic enforcement is what makes Data Contracts a powerful tool for building a culture of data reliability.
 
-```
-```
 
