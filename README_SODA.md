@@ -115,6 +115,10 @@ source .venv/bin/activate
 Install the Soda Library package for PostgreSQL. This tutorial uses a PostgreSQL sample dataset, but Soda supports over 20 different data sources.
 
 
+![Data Visualization](images/data.png)
+
+
+
 
 ```bash
 # Install Soda Library for PostgreSQL
