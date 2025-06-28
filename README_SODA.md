@@ -235,10 +235,10 @@ This "shift-left" approach ensures that data quality is a responsibility of the 
 
 
 
-````markdown
+
 ## Practical Demo: Verifying a Data Contract Programmatically
 
-To see a Data Contract in action, you can explore our hands‑on demonstration in a Google Colab notebook. This notebook simulates a CI/CD process where a contract is verified against a live data source before the "code" is approved.
+To see a Data Contract in action, you can explore  hands‑on demonstration in a Google Colab notebook. This notebook simulates a CI/CD process where a contract is verified against a live data source before the "code" is approved.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1zkV_2tLJ4ohdzmKGS3LgdFDDnTNTUXew)
 
