@@ -4,6 +4,9 @@ A comprehensive platform for ensuring reliable, trustworthy, and high-quality da
 
 ---
 
+![Soda Reconciliation GIF](https://docs.soda.io/assets/images/reconciliation.gif)
+
+
 ## What is Soda?
 
 In today's data-driven world, poor data quality leads to flawed business decisions, erodes trust, and creates costly engineering rework. Soda is an open-source, data reliability platform that enables data teams to proactively find, analyze, and resolve data issues before they have a downstream impact.
