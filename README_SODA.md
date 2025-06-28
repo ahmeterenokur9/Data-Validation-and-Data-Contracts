@@ -1,6 +1,6 @@
 # Soda: The End-to-End Platform for Data Quality
 
-![Sodali](images/soda.jpg)
+![Sodali](images/sodaa.jpg)
 
 A comprehensive platform for ensuring reliable, trustworthy, and high-quality data across your entire data stack.
 
