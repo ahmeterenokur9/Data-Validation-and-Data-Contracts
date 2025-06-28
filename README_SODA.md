@@ -1,4 +1,4 @@
-![Soda Logo](https://cdn.prod.website-files.com/5d2a159e86b66b534fbc0d86/62837efac72f39db72c646d6_Soda-logo%20-newhires-p-800.jpeg)
+![Soda Logo](https://repository-images.githubusercontent.com/321458274/c25b7400-5747-11eb-9ad2-452a7bdfad0e)
 
 ---
 
