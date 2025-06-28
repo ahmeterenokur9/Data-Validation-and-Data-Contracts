@@ -234,7 +234,7 @@ The Data Contract process is designed to integrate seamlessly into your software
 This "shift-left" approach ensures that data quality is a responsibility of the producer, not an afterthought for the consumer. It builds a foundation of trust and reliability directly into the development process.
 
 
-````markdown
+
 ## Practical Demo: Verifying a Data Contract Programmatically
 
 To see a Data Contract in action, you can explore our hands‑on demonstration in a Google Colab notebook. This notebook simulates a CI/CD process where a contract is verified against a live data source before the "code" is approved.
