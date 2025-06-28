@@ -73,7 +73,7 @@ Soda's execution engine can be deployed in a way that best fits your infrastruct
 * **Soda Library**: The core Python library and Command-Line Interface (CLI). Ideal for self-operated deployments—run scans from your local machine, a CI/CD runner, or a data orchestrator like Airflow.
 * **Soda Agent**: A secure, containerized version of the Soda Library. Acts as a bridge, allowing Soda Cloud to initiate scans within your private network without exposing database credentials. This underpins both Soda-hosted and self-hosted deployments, enabling a user-friendly, UI-driven experience.
 
-````markdown
+
 ## Getting Started: Your First Data Quality Scan
 
 The fastest way to experience Soda is to run a scan on your local machine using our "Take a Sip" tutorial. This 15-minute guide will walk you through setting up Soda, running it against a sample dataset, and seeing the results.
