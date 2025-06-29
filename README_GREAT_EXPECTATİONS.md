@@ -1,5 +1,6 @@
 # Great Expectations (GX)
-![GX](images/great expectations.jpeg)
+
+![GX](images/GX.jpeg)
 
 ## 1. What is Great Expectations?
 
