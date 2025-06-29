@@ -106,17 +106,90 @@ print(results.describe())
 
 Validation results will appear in the GX Cloud UI for review and collaboration.
 
-## 7. Key Management Features: Metrics, Schedules, and Alerts
+## 7. Operational Management: Metrics, Validations, Schedules, and Alerts
 
-* **Metrics & Profiling**: Get min, max, null %, and other key stats per column — even before writing tests.
-* **Validations & Schedules**:
+Once your Data Assets and Expectations are configured, **GX Cloud** provides a powerful set of operational tools to manage the full data quality lifecycle. These features help you move beyond defining data quality toward actively monitoring, automating, and responding to it.
 
-  * Trigger validations manually or on a schedule (default: every 24 hours).
-  * Timeline graphs show history and trends.
-* **Alerts & Notifications**:
+### 📊 Data Profiling and Metrics
 
-  * Get notified via email when validations fail.
-  * Get ExpectAI alerts for new recommended tests.
-  * Configure alerts per user and per asset for relevance.
+Before writing effective Expectations, understanding your data is crucial. GX Cloud includes built-in profiling tools for this purpose.
+
+- **Automatic and On-Demand Profiling**:  
+  Upon creation, each Data Asset is automatically analyzed for basic schema information. You can also trigger deeper profiling manually by clicking "Profile Data" from the **Metrics** tab.
+
+- **Key Metrics Provided**:
+  - **Row Count**: Total number of records.
+  - **Data Type**: As reported by the source system (e.g., `INTEGER`, `VARCHAR`, `TIMESTAMP`).
+  - **Numeric Statistics**: For numerical columns – `Min`, `Max`, `Mean`, `Median`.
+  - **Completeness**: Percentage of `NULL` values per column.
+
+These insights directly inform the creation of Expectations.  
+_Example: If you see a `transaction_value` column has a minimum of `-50.00`, you might add_  
+```python
+expect_column_values_to_be_between(min_value=0)
+````
+
+*to flag invalid data.*
+
+---
+
+### ✅ Running Validations & Automating with Schedules
+
+**Validations** are when GX runs Expectations against actual data. GX Cloud makes this easy to do manually or on a recurring schedule.
+
+* **Manual Validations**:
+  Trigger an instant check by clicking **Validate** from a Data Asset page — ideal when:
+
+  * Creating or debugging new Expectations.
+  * Investigating a recent change in the data.
+
+* **Batch-Aware Validations**:
+  For time-based datasets, validations can be scoped using `DATE` or `DATETIME` fields.
+
+  * **Latest**: Validate only the most recent batch (e.g., yesterday).
+  * **Custom**: Validate specific periods (e.g., May 2024).
+
+* **Validation History**:
+
+  * View past results in a **timeline graph**.
+  * Filter by **failures only** for faster triage.
+  * Each run has a **shareable URL** for team collaboration.
+
+* **Automated Schedules**:
+
+  * When your first Expectation is added, a **daily validation schedule** is enabled by default.
+  * You can change:
+
+    * **Frequency** (e.g., hourly, weekly)
+    * **Start Time**
+    * Or disable it altogether via a toggle.
+
+  ⚠️ *Note: These built-in schedules are only for **UI-managed** Expectations. For **API-managed** Expectations, use external orchestrators like Airflow.*
+
+---
+
+### 🚨 Proactive Alerts & Notifications
+
+GX Cloud ensures you’re notified of critical quality events — before they impact your downstream systems.
+
+* **Alert Triggers**:
+
+  * When a **validation fails**.
+  * When **ExpectAI** completes an analysis and recommends new Expectations.
+
+* **Personalized Configuration**:
+
+  * Alerts are set **per-user and per-asset**.
+  * You receive alerts only for the data you are responsible for.
+
+* **Smart Defaults**:
+
+  * Alerts are **enabled by default** for Data Assets you create.
+  * Alerts are **disabled by default** for assets created by others.
+
+Manage all alert preferences from the **Alerts** tab of any Data Asset using simple toggle switches.
+
+
+
 
 
