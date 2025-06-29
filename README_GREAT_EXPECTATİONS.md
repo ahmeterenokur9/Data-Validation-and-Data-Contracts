@@ -220,7 +220,83 @@ GX Cloud ensures you’re notified of critical quality events — before they im
 
 Manage all alert preferences from the **Alerts** tab of any Data Asset using simple toggle switches.
 
+# Example Workflow: A Visual Tour of the GX Cloud UI
 
+To understand how these concepts come together in practice, let's walk through a typical workflow using the Great Expectations Cloud web interface. This example uses the built-in demo data to showcase the end-to-end process from connection to debugging.
+
+---
+
+### Step 1: Connect to a Data Source
+
+Your journey begins on the connection screen. Here, you can establish a direct connection to your primary data sources like Snowflake, PostgreSQL, Databricks SQL, or Redshift.
+
+For a quick start without connecting to your own infrastructure, you can select **"Use demo data"**, which provides a pre-loaded sample dataset.
+
+![Step 1 - Connect to Data Source](images/1.png)
+
+---
+
+### Step 2: Select Your Data Asset
+
+Once you've selected a data source (in this case, the GX demo data), you are presented with a list of available tables. You select the tables you want to monitor. Each selected table becomes a Data Asset in GX Cloud. Here, we've selected the `nyc_taxi_data` table.
+
+![Step 2 - Select Data Asset](images/2.png)
+
+---
+
+### Step 3: Enable Automated Anomaly Detection
+
+This is a key step for accelerating your data quality coverage. By default, GX Cloud automatically enables Anomaly Detection for your new Data Asset. It pre-configures and monitors three critical data quality dimensions:
+
+- **Schema:** Detects any changes to column names or the total number of columns.
+- **Volume:** Monitors the table's row count to detect unexpected drops or non-increasing volume.
+- **Completeness:** Tracks the proportion of null vs. non-null values in each column to spot changes in data integrity.
+
+You can de-select any of these if you wish, but they provide an excellent baseline for data health monitoring.
+
+![Step 3 - Enable Anomaly Detection](images/3.png)
+
+---
+
+### Step 4: Create Specific Expectations
+
+After setting up the automated baseline, you can define more specific, business-focused rules. The **New Expectation** screen helps you do this by organizing tests into logical categories like Numeric, Uniqueness, Validity (for pattern matching), and even custom SQL.
+
+The UI also provides helpful suggestions. For instance, it recommends checking that the `fare_amount` is within a reasonable range and that the `pickup_borough` values are from a specific, valid set.
+
+![Step 4 - Create Specific Expectations](images/4.png)
+
+---
+
+### Step 5: View the Overall Health Dashboard
+
+The main **Expectations** tab serves as your central data quality dashboard. It provides a high-level overview of all your data quality tests, grouped by category. You can immediately see what's working ("All passed") and what's broken.
+
+In this example, we can instantly see that there are failures in our Numeric and SQL expectations, indicating a problem that needs investigation.
+
+![Step 5 - Health Dashboard](images/5.png)
+
+---
+
+### Step 6: Filter Your View for Focus
+
+The dashboard can be filtered to help you focus. Here, the view has been filtered to show only **"Anomaly Detection"** rules. This allows you to quickly check the status of the automated baseline tests that were configured in Step 3, separate from the more specific, explicit rules you may have created manually.
+
+![Step 6 - Filter View](images/6.png)
+
+---
+
+### Step 7: Drill Down into Failures for Root Cause Analysis
+
+This is where GX Cloud provides true, actionable insights. By switching to the **Validations** tab and filtering for **"Failures only"**, you can investigate why a test failed.
+
+For the Custom SQL Expectations, it shows the exact number of unexpected rows (1,144 and 1,359) returned by the queries, confirming a logic or data integrity violation.
+
+For the `fare_amount` validation, the result is even more detailed. It not only shows that the rule failed with a Success rate of 99.37%, but it also provides a Sample of unexpected values (-21, -17.75, -12.5, etc.).
+
+This sample of failing data is critical for debugging, as it allows a developer to immediately see the nature of the bad data (in this case, negative fare amounts) and fix the root cause.
+
+![Step 7 - Root Cause Analysis](images/7.png)
 
 
 
