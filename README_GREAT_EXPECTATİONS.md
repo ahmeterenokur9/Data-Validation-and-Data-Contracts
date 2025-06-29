@@ -30,6 +30,8 @@ As a Python library, GX integrates seamlessly into data pipelines, CI/CD workflo
 
 ## 3. The GX Cloud Workflow
 
+![GX](images/GX_workflow.jpeg)
+
 A typical workflow in GX Cloud involves:
 
 1. **Connect to Data**: Securely connect to your source (e.g., PostgreSQL, Snowflake).
@@ -40,6 +42,8 @@ A typical workflow in GX Cloud involves:
    - Using **ExpectAI** for AI-recommended tests
 4. **Validate Your Data**: Run checks manually, on a schedule, or via orchestrators like Airflow.
 5. **Review & Share**: Analyze results in dashboards, and share links with your team.
+
+![GX](images/GX_workflow2.jpeg)
 
 ## 4. Deployment Patterns
 
