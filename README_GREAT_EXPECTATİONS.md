@@ -344,7 +344,7 @@ import great_expectations as gx
 print(gx.__version__)
 ```
 
-## ✅ Example 1: Validate Data in a Pandas DataFrame
+## ✅ Example : Validate Data in a Pandas DataFrame
 
 This workflow is ideal for local testing, data exploration, or quick prototypes.
 
@@ -465,56 +465,6 @@ The output will confirm whether the data met the expectation:
 This simple example illustrates the full lifecycle of data validation using GX Core with Pandas. It can easily be extended to include multiple expectations or be used in automated workflows.
 
 
-##  Example 2: Validate Data in a SQL Table
-
-### 1. Create Context and Connect
-
-```python
-context = gx.get_context()
-
-connection_string = "postgresql+psycopg2://try_gx:try_gx@postgres.workshops.greatexpectations.io/gx_example_db"
-data_source = context.data_sources.add_postgres("postgres db", connection_string=connection_string)
-data_asset = data_source.add_table_asset(name="taxi data", table_name="nyc_taxi_data")
-batch_definition = data_asset.add_batch_definition_whole_table("batch definition")
-```
-
-
----
-
-### 2. Create Expectation Suite
-
-```python
-suite = context.suites.add(gx.ExpectationSuite(name="expectations"))
-suite.add_expectation(gx.expectations.ExpectColumnValuesToBeBetween(column="passenger_count", min_value=1, max_value=6))
-suite.add_expectation(gx.expectations.ExpectColumnValuesToBeBetween(column="fare_amount", min_value=0))
-```
-
-
----
-
-### 3. Create a Validation Definition
-
-```python
-validation_definition = context.validation_definitions.add(
-    gx.ValidationDefinition(name="validation definition", data=batch_definition, suite=suite)
-)
-```
-
-
----
-
-### 4. Create and Run Checkpoint
-
-```python
-checkpoint = context.checkpoints.add(
-    gx.Checkpoint(name="checkpoint", validation_definitions=[validation_definition])
-)
-checkpoint_result = checkpoint.run()
-print(checkpoint_result.describe())
-```
-
-
----
 
 ## 🔐 Secure Credential Management
 
