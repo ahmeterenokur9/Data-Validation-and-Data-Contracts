@@ -50,8 +50,12 @@ A typical workflow in GX Cloud involves:
 | Pattern        | How It Works                                                                                     | When to Use It                                                                 |
 |----------------|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
 | Fully-Hosted   | GX Cloud connects to your data via a secure, read-only cloud connection.                         | Quick setup; ideal for open environments.                                      |
+
 | Agent-Enabled  | You run a GX Agent in your environment; data stays private.                                       | For strict security policies; control stays internal.                          |
+
+
 | Read-Only      | You run validations locally with the open-source GX lib; only metadata is sent to GX Cloud.      | For advanced users who need full control and only want to use GX Cloud for UI. |
+
 
 ## 5. Connecting to Data Sources
 
