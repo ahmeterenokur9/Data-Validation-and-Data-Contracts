@@ -299,4 +299,207 @@ This sample of failing data is critical for debugging, as it allows a developer 
 ![Step 7 - Root Cause Analysis](images/7.png)
 
 
+# GX Core: The Python Data Quality Engine
+
+**GX Core** is the open-source Python library that serves as the foundation for all Great Expectations functionality. It provides a powerful, programmatic interface for developers who want to integrate data quality directly into their code, build custom data validation workflows, and maintain complete control over their execution environment.
+
+---
+
+## 🧭 The Pattern of a GX Workflow
+
+All workflows in GX Core—whether simple scripts or production pipelines—follow a consistent four-step pattern:
+
+1. **Set up a GX Environment**  
+   Initialize a Data Context, the central object that manages configurations, connections, and results.
+
+2. **Connect to Data**  
+   Define your Data Sources and Data Assets (tables, files, etc.) that you want to validate.
+
+3. **Define Expectations**  
+   Write Expectations (data quality rules) and organize them into Expectation Suites.
+
+4. **Run Validations**  
+   Use Checkpoints or validation definitions to validate data and trigger results or alerts.
+
+![Workflow Overview](images/gx_core_workflow.png)
+
+---
+
+## ⚙️ Setup and Quick Start Examples
+
+### 🔧 Prerequisites
+
+- Python 3.9 to 3.12
+
+### 📦 Installation
+
+```bash
+pip install great_expectations
+````
+
+To verify installation:
+
+```python
+import great_expectations as gx
+print(gx.__version__)
+```
+
+---
+
+## ✅ Example 1: Validate Data in a Pandas DataFrame
+
+This workflow is ideal for quick local validations and prototyping.
+
+### 1. Create a Data Context
+
+```python
+context = gx.get_context()
+```
+
+
+---
+
+### 2. Connect to Data and Create Batch
+
+```python
+data_source = context.data_sources.add_pandas("pandas")
+data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
+batch_definition = data_asset.add_batch_definition_whole_dataframe("batch definition")
+batch = batch_definition.get_batch(batch_parameters={"dataframe": df})
+```
+
+
+---
+
+### 3. Create an Expectation
+
+```python
+expectation = gx.expectations.ExpectColumnValuesToBeBetween(
+    column="passenger_count", min_value=1, max_value=6
+)
+```
+
+---
+
+### 4. Validate and Review
+
+```python
+validation_result = batch.validate(expectation)
+print(validation_result)
+```
+
+Validation results will be returned in JSON format:
+
+```json
+{
+  "success": true,
+  "expectation_config": { ... },
+  "result": {
+    "element_count": 10000,
+    "unexpected_count": 0
+  }
+}
+```
+
+---
+
+## 🛠️ Example 2: Validate Data in a SQL Table
+
+### 1. Create Context and Connect
+
+```python
+context = gx.get_context()
+
+connection_string = "postgresql+psycopg2://try_gx:try_gx@postgres.workshops.greatexpectations.io/gx_example_db"
+data_source = context.data_sources.add_postgres("postgres db", connection_string=connection_string)
+data_asset = data_source.add_table_asset(name="taxi data", table_name="nyc_taxi_data")
+batch_definition = data_asset.add_batch_definition_whole_table("batch definition")
+```
+
+
+---
+
+### 2. Create Expectation Suite
+
+```python
+suite = context.suites.add(gx.ExpectationSuite(name="expectations"))
+suite.add_expectation(gx.expectations.ExpectColumnValuesToBeBetween(column="passenger_count", min_value=1, max_value=6))
+suite.add_expectation(gx.expectations.ExpectColumnValuesToBeBetween(column="fare_amount", min_value=0))
+```
+
+
+---
+
+### 3. Create a Validation Definition
+
+```python
+validation_definition = context.validation_definitions.add(
+    gx.ValidationDefinition(name="validation definition", data=batch_definition, suite=suite)
+)
+```
+
+
+---
+
+### 4. Create and Run Checkpoint
+
+```python
+checkpoint = context.checkpoints.add(
+    gx.Checkpoint(name="checkpoint", validation_definitions=[validation_definition])
+)
+checkpoint_result = checkpoint.run()
+print(checkpoint_result.describe())
+```
+
+
+---
+
+## 🔐 Secure Credential Management
+
+### Store Credentials as Environment Variables
+
+```bash
+export MY_PG_USER="your_username"
+export MY_PG_PASSWORD="your_secret_password"
+export MY_PG_HOST="your_db_host"
+```
+
+### Reference in Python
+
+```python
+connection_string = "postgresql+psycopg2://${MY_PG_USER}:${MY_PG_PASSWORD}@${MY_PG_HOST}/my_db"
+```
+
+
+---
+
+## 🧪 Create an Expectation
+
+```python
+from great_expectations import expectations as gxe
+
+preset_expectation = gxe.ExpectColumnMaxToBeBetween(
+    column="passenger_count", min_value=1, max_value=6
+)
+```
+
+
+---
+
+## 🔁 Create a Reusable Validation Definition
+
+```python
+validation_definition = gx.ValidationDefinition(
+    name="validate_daily_taxi_data_against_core_rules",
+    data=batch_definition,
+    suite=expectation_suite
+)
+
+context.validation_definitions.add(validation_definition)
+```
+
+This allows for repeatable validations and forms the backbone of your data quality pipelines.
+
+
+
 
