@@ -47,14 +47,35 @@ A typical workflow in GX Cloud involves:
 
 ## 4. Deployment Patterns
 
-| Pattern        | How It Works                                                                                     | When to Use It                                                                 |
-|----------------|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| Fully-Hosted   | GX Cloud connects to your data via a secure, read-only cloud connection.                         | Quick setup; ideal for open environments.                                      |
+### Fully-Hosted
 
-| Agent-Enabled  | You run a GX Agent in your environment; data stays private.                                       | For strict security policies; control stays internal.                          |
+| Pattern      | How It Works                                                         | When to Use It                    |
+|--------------|----------------------------------------------------------------------|----------------------------------|
+| Fully-Hosted | GX Cloud connects to your data via a secure, read-only cloud connection. | Quick setup; ideal for open environments. |
+
+![Fully Hosted Deployment](images/GX_fh.png)
+
+---
+
+### Agent-Enabled
+
+| Pattern       | How It Works                                            | When to Use It                         |
+|---------------|---------------------------------------------------------|---------------------------------------|
+| Agent-Enabled | You run a GX Agent in your environment; data stays private. | For strict security policies; control stays internal. |
+
+![Agent Enabled Deployment](images/GX_agent.png)
+
+---
+
+### Read-Only
+
+| Pattern   | How It Works                                                   | When to Use It                                                           |
+|-----------|----------------------------------------------------------------|-------------------------------------------------------------------------|
+| Read-Only | You run validations locally with the open-source GX lib; only metadata is sent to GX Cloud. | For advanced users who need full control and only want to use GX Cloud for UI. |
+
+![Read Only Deployment](images/GX_reado.png)
 
 
-| Read-Only      | You run validations locally with the open-source GX lib; only metadata is sent to GX Cloud.      | For advanced users who need full control and only want to use GX Cloud for UI. |
 
 
 ## 5. Connecting to Data Sources
