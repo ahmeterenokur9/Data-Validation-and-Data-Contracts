@@ -305,7 +305,7 @@ This sample of failing data is critical for debugging, as it allows a developer 
 
 ---
 
-## 🧭 The Pattern of a GX Workflow
+##  The Pattern of a GX Workflow
 
 All workflows in GX Core—whether simple scripts or production pipelines—follow a consistent four-step pattern:
 
@@ -321,17 +321,17 @@ All workflows in GX Core—whether simple scripts or production pipelines—foll
 4. **Run Validations**  
    Use Checkpoints or validation definitions to validate data and trigger results or alerts.
 
-![Workflow Overview](images/gx_core_workflow.png)
+![Workflow Overview](images/GX_core.png)
 
 ---
 
-## ⚙️ Setup and Quick Start Examples
+##  Setup and Quick Start Examples
 
-### 🔧 Prerequisites
+###  Prerequisites
 
 - Python 3.9 to 3.12
 
-### 📦 Installation
+###  Installation
 
 ```bash
 pip install great_expectations
@@ -346,7 +346,7 @@ print(gx.__version__)
 
 ---
 
-## ✅ Example 1: Validate Data in a Pandas DataFrame
+##  Example 1: Validate Data in a Pandas DataFrame
 
 This workflow is ideal for quick local validations and prototyping.
 
@@ -403,7 +403,7 @@ Validation results will be returned in JSON format:
 
 ---
 
-## 🛠️ Example 2: Validate Data in a SQL Table
+##  Example 2: Validate Data in a SQL Table
 
 ### 1. Create Context and Connect
 
@@ -473,7 +473,7 @@ connection_string = "postgresql+psycopg2://${MY_PG_USER}:${MY_PG_PASSWORD}@${MY_
 
 ---
 
-## 🧪 Create an Expectation
+##  Create an Expectation
 
 ```python
 from great_expectations import expectations as gxe
@@ -486,7 +486,7 @@ preset_expectation = gxe.ExpectColumnMaxToBeBetween(
 
 ---
 
-## 🔁 Create a Reusable Validation Definition
+##  Create a Reusable Validation Definition
 
 ```python
 validation_definition = gx.ValidationDefinition(
