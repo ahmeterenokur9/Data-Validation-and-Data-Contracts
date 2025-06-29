@@ -344,22 +344,51 @@ import great_expectations as gx
 print(gx.__version__)
 ```
 
+## ✅ Example 1: Validate Data in a Pandas DataFrame
+
+This workflow is ideal for local testing, data exploration, or quick prototypes.
+
 ---
 
-##  Example 1: Validate Data in a Pandas DataFrame
+###  Step 1: Import Required Libraries
 
-This workflow is ideal for quick local validations and prototyping.
+Begin by importing the `great_expectations` and `pandas` libraries.
 
-### 1. Create a Data Context
+```python
+import great_expectations as gx
+import pandas as pd
+````
+
+---
+
+###  Step 2: Load Sample Data
+
+Download and load a demo dataset into a Pandas DataFrame.
+
+```python
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/great-expectations/gx_tutorials/main/data/yellow_tripdata_sample_2019-01.csv"
+)
+```
+
+
+---
+
+###  Step 3: Create a Data Context
+
+A Data Context is the main entrypoint for interacting with GX.
 
 ```python
 context = gx.get_context()
 ```
 
 
+
 ---
 
-### 2. Connect to Data and Create Batch
+###  Step 4: Connect to Data and Create a Batch
+
+Define a Data Source, Data Asset, and Batch Definition. Then load your DataFrame as a Batch.
 
 ```python
 data_source = context.data_sources.add_pandas("pandas")
@@ -369,9 +398,12 @@ batch = batch_definition.get_batch(batch_parameters={"dataframe": df})
 ```
 
 
+
 ---
 
-### 3. Create an Expectation
+###  Step 5: Create an Expectation
+
+Define an Expectation that the `passenger_count` column should only contain values between 1 and 6.
 
 ```python
 expectation = gx.expectations.ExpectColumnValuesToBeBetween(
@@ -379,29 +411,59 @@ expectation = gx.expectations.ExpectColumnValuesToBeBetween(
 )
 ```
 
+
 ---
 
-### 4. Validate and Review
+###  Step 6: Validate the Data and View Results
+
+Run the validation and print the results:
 
 ```python
 validation_result = batch.validate(expectation)
 print(validation_result)
 ```
 
-Validation results will be returned in JSON format:
+The output will confirm whether the data met the expectation:
 
 ```json
 {
   "success": true,
-  "expectation_config": { ... },
+  "expectation_config": {
+    "type": "expect_column_values_to_be_between",
+    "kwargs": {
+      "batch_id": "pandas-pd dataframe asset",
+      "column": "passenger_count",
+      "min_value": 1.0,
+      "max_value": 6.0
+    },
+    "meta": {}
+  },
   "result": {
     "element_count": 10000,
-    "unexpected_count": 0
+    "unexpected_count": 0,
+    "unexpected_percent": 0.0,
+    "partial_unexpected_list": [],
+    "missing_count": 0,
+    "missing_percent": 0.0,
+    "unexpected_percent_total": 0.0,
+    "unexpected_percent_nonmissing": 0.0,
+    "partial_unexpected_counts": [],
+    "partial_unexpected_index_list": []
+  },
+  "meta": {},
+  "exception_info": {
+    "raised_exception": false,
+    "exception_traceback": null,
+    "exception_message": null
   }
 }
 ```
 
+
 ---
+
+This simple example illustrates the full lifecycle of data validation using GX Core with Pandas. It can easily be extended to include multiple expectations or be used in automated workflows.
+
 
 ##  Example 2: Validate Data in a SQL Table
 
