@@ -1191,7 +1191,309 @@ MySchema.validate(
 # 4        5
 ```
 
+# Lazy Validation
+
+By default, when you call the `validate()` method on a schema or its components, **Pandera raises a `SchemaError` immediately upon the first failure** it detects. These failures include:
+
+* A required column is missing in the DataFrame.
+* If `strict=True`, the DataFrame contains columns not defined in the schema.
+* Data types don’t match.
+* Columns can’t be coerced to the specified data type (if `coerce=True`).
+* A column’s check fails (returns `False` or a boolean series with any `False`).
+
 ---
+
+### Example of immediate failure:
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+
+df = pd.DataFrame({"column": ["a", "b", "c"]})
+
+schema = pa.DataFrameSchema({"column": pa.Column(int)})
+
+try:
+    schema.validate(df)
+except pa.errors.SchemaError as exc:
+    print(exc)
+# Output:
+# expected series 'column' to have type int64, got object
+```
+
+---
+
+### Why use Lazy Validation?
+
+In complex cases with many columns and checks, **it is helpful to collect all errors in one go** to better understand all the issues at once instead of fixing them one by one.
+
+---
+
+### How to enable Lazy Validation:
+
+Pass the keyword argument `lazy=True` to the `validate()` method. This causes Pandera to collect **all errors** and raise a `SchemaErrors` exception with detailed information on every failure.
+
+---
+
+### Example with lazy=True:
+
+```python
+import json
+import pandas as pd
+import pandera.pandas as pa
+
+schema = pa.DataFrameSchema(
+    columns={
+        "int_column": pa.Column(int),
+        "float_column": pa.Column(float, pa.Check.greater_than(0)),
+        "str_column": pa.Column(str, pa.Check.equal_to("a")),
+        "date_column": pa.Column(pa.DateTime),
+    },
+    strict=True
+)
+
+df = pd.DataFrame({
+    "int_column": ["a", "b", "c"],
+    "float_column": [0, 1, 2],
+    "str_column": ["a", "b", "d"],
+    "unknown_column": None,
+})
+
+try:
+    schema.validate(df, lazy=True)
+except pa.errors.SchemaErrors as exc:
+    print(json.dumps(exc.message, indent=2))
+```
+
+---
+
+### Output explanation:
+
+The error report will show multiple problems:
+
+* **Column not in schema:** `'unknown_column'` exists in the DataFrame but not in the schema (because `strict=True`).
+* **Column not in DataFrame:** `'date_column'` is missing in the DataFrame.
+* **Wrong data types:** The `"int_column"` has string values, `"float_column"` is int instead of float.
+* **Data check failures:**
+
+  * `float_column` contains 0 which is not greater than 0.
+  * `str_column` contains values other than `"a"`.
+
+---
+
+### Inspect failure cases and data:
+
+You can also access detailed failure information programmatically:
+
+```python
+try:
+    schema.validate(df, lazy=True)
+except pa.errors.SchemaErrors as exc:
+    print("Schema errors and failure cases:")
+    print(exc.failure_cases)
+    print("\nDataFrame object that failed validation:")
+    print(exc.data)
+```
+
+# Error Reports
+
+Pandera's **error report** is a **generalized, machine-readable summary** of all validation failures that occur during schema validation. It works with both **pandas** and **pyspark.sql** data structures.
+
+---
+
+### Validation Depth Settings
+
+You can control the **level of validation** Pandera performs by setting an environment variable:
+
+* **SCHEMA\_ONLY:** Validate only the schema structure (e.g., column names and types).
+  No data-level checks (e.g., value ranges) are run.
+
+* **DATA\_ONLY:** Validate only data-level checks (e.g., values passing conditions).
+  Schema structure is not validated.
+
+* **SCHEMA\_AND\_DATA:** (default) Validate both schema and data level checks for thorough validation.
+
+You can set this environment variable before running your code:
+
+```bash
+export PANDERA_VALIDATION_DEPTH=SCHEMA_ONLY
+```
+
+---
+
+### Error Reports with Pandas
+
+To generate an error report, you must validate with `lazy=True` to collect all errors before raising the exception.
+
+Example:
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+import json
+
+pandas_schema = pa.DataFrameSchema(
+    {
+        "color": pa.Column(str, pa.Check.isin(["red", "green", "blue"])),
+        "length": pa.Column(int, pa.Check.gt(10)),
+    }
+)
+
+df = pd.DataFrame({
+    "color": ["red", "blue", "purple", "green"],
+    "length": [4, 11, 15, 39],
+})
+
+try:
+    pandas_schema.validate(df, lazy=True)
+except pa.errors.SchemaErrors as e:
+    print(json.dumps(e.message, indent=2))
+```
+
+Output:
+
+```json
+{
+  "DATA": {
+    "DATAFRAME_CHECK": [
+      {
+        "schema": null,
+        "column": "color",
+        "check": "isin(['red', 'green', 'blue'])",
+        "error": "Column 'color' failed element-wise validator number 0: isin(['red', 'green', 'blue']) failure cases: purple"
+      },
+      {
+        "schema": null,
+        "column": "length",
+        "check": "greater_than(10)",
+        "error": "Column 'length' failed element-wise validator number 0: greater_than(10) failure cases: 4"
+      }
+    ]
+  }
+}
+```
+
+* This report clearly shows the errors in the `color` and `length` columns with details about the failed checks and the specific invalid values.
+
+---
+
+### Error Reports with PySpark
+
+For PySpark DataFrames, the error report is accessible via the `errors` attribute on the Pandera accessor after validation.
+
+Example:
+
+```python
+import pandera.pyspark as pa
+import pyspark.sql.types as T
+import json
+from pyspark.sql import SparkSession
+from pandera.pyspark import DataFrameModel
+
+spark = SparkSession.builder.getOrCreate()
+
+class PysparkPanderSchema(DataFrameModel):
+    color: T.StringType() = pa.Field(isin=["red", "green", "blue"])
+    length: T.IntegerType() = pa.Field(gt=10)
+
+data = [("red", 4), ("blue", 11), ("purple", 15), ("green", 39)]
+
+spark_schema = T.StructType([
+    T.StructField("color", T.StringType(), False),
+    T.StructField("length", T.IntegerType(), False),
+])
+
+df = spark.createDataFrame(data, spark_schema)
+
+df_out = PysparkPanderSchema.validate(check_obj=df)
+
+print(json.dumps(dict(df_out.pandera.errors), indent=4))
+```
+
+Output:
+
+```json
+{
+    "DATA": {
+        "DATAFRAME_CHECK": [
+            {
+                "schema": "PysparkPanderSchema",
+                "column": "color",
+                "check": "isin(['red', 'green', 'blue'])",
+                "error": "column 'color' with type StringType() failed validation isin(['red', 'green', 'blue'])"
+            },
+            {
+                "schema": "PysparkPanderSchema",
+                "column": "length",
+                "check": "greater_than(10)",
+                "error": "column 'length' with type IntegerType() failed validation greater_than(10)"
+            }
+        ]
+    }
+}
+```
+
+# Supported DataFrame Libraries
+
+Pandera was initially designed as a validation library specifically for **pandas DataFrames**, and it will continue to support pandas as its core functionality.
+
+However, due to growing adoption, Pandera has expanded to support validation for multiple other **dataframe-like** libraries, making it a more versatile tool across different ecosystems.
+
+---
+
+### Supported DataFrame Libraries
+
+Pandera currently supports validation of the following dataframe libraries:
+
+* **Pandas:**
+  The original dataframe library Pandera was built for, supporting full validation of pandas DataFrames.
+
+* **Polars:**
+  A fast dataframe library with a focus on performance and speed, supported by Pandera for validation.
+
+* **PySpark SQL:**
+  A distributed data processing library often used for large-scale data processing, with Pandera support for validating PySpark DataFrames.
+
+---
+
+### Validating Pandas-like DataFrames (Out-of-Memory and Distributed DataFrames)
+
+Pandera integrates with several libraries that provide pandas-like APIs but can handle data that does **not fit into memory** or operate in a distributed environment. These are supported via Pandera’s pandas backend:
+
+* **Dask:**
+  Enables applying Pandera schemas to Dask DataFrame partitions for parallel and out-of-core processing.
+
+* **Modin:**
+  A drop-in replacement for pandas that can run on distributed backends like Ray or Dask.
+
+* **PySpark Pandas:**
+  The pandas-like API provided by PySpark, enabling Pandera validation on large datasets processed via Spark.
+
+---
+
+### Domain-Specific Data Validation Support
+
+Pandera can also leverage domain-specific pandas extensions, providing validation support for their specialized data types and methods:
+
+* **GeoPandas:**
+  Extends pandas with geospatial data processing capabilities. Pandera supports validating GeoDataFrames.
+
+---
+
+### Alternative Acceleration Frameworks
+
+Besides the libraries above, Pandera supports integration with dataframe-agnostic distributed validation frameworks:
+
+* **Fugue:**
+  Allows Pandera schemas to be applied to distributed dataframe partitions, enabling distributed validation beyond pandas alone.
+
+---
+
+
+
+
+
+
 
 
 
