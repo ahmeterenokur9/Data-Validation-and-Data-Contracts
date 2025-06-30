@@ -939,6 +939,160 @@ class DFModel(pa.DataFrameModel):
 
 ---
 
+# Pandera Decorators for Pipeline Integration
+
+Pandera provides decorators that make it easy to **validate pandas DataFrames or Series** passed into or returned from your existing functions, helping to integrate validation smoothly into data pipelines.
+
+---
+
+### 1. `@check_input`
+
+* Validates the **input** DataFrame or Series before the wrapped function runs.
+* By default, assumes the **first positional argument** is the DataFrame/Series to validate.
+* You can specify which argument to check by **name** (string) or **index** (integer).
+
+**Example:**
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+
+df = pd.DataFrame({
+    "column1": [1, 4, 0, 10, 9],
+    "column2": [-1.3, -1.4, -2.9, -10.1, -20.4],
+})
+
+in_schema = pa.DataFrameSchema({
+    "column1": pa.Column(int, pa.Check(lambda x: 0 <= x <= 10, element_wise=True)),
+    "column2": pa.Column(float, pa.Check(lambda x: x < -1.2)),
+})
+
+@pa.check_input(in_schema)
+def preprocessor(dataframe):
+    dataframe["column3"] = dataframe["column1"] + dataframe["column2"]
+    return dataframe
+
+preprocessed_df = preprocessor(df)
+print(preprocessed_df)
+```
+
+Output:
+
+| column1 | column2 | column3 |
+| ------- | ------- | ------- |
+| 1       | -1.3    | -0.3    |
+| 4       | -1.4    | 2.6     |
+| 0       | -2.9    | -2.9    |
+| 10      | -10.1   | -0.1    |
+| 9       | -20.4   | -11.4   |
+
+---
+
+### 2. `@check_output`
+
+* Validates the **output** DataFrame or Series from the wrapped function.
+* Works by default on the sole output, but you can specify an **index**, a **key** (if output is dict-like), or a **custom function** to select the output to validate.
+
+**Example:**
+
+```python
+out_schema = pa.DataFrameSchema({
+    "column1": pa.Column(int, pa.Check(lambda x: x == 0))
+})
+
+@pa.check_output(out_schema)
+def zero_column_1(df):
+    df["column1"] = 0
+    return df
+
+zeroed_df = zero_column_1(preprocessed_df)
+```
+
+This checks that all values in `"column1"` are zero.
+
+---
+
+### 3. `@check_io`
+
+* Convenient decorator to validate **both inputs and outputs** in one place.
+* You can specify input and output schemas as keyword arguments with any names.
+
+**Example:**
+
+```python
+in_schema = pa.DataFrameSchema({
+    "column1": pa.Column(int),
+    "column2": pa.Column(float),
+})
+
+out_schema = in_schema.add_columns({"column3": pa.Column(float)})
+
+@pa.check_io(df1=in_schema, df2=in_schema, out=out_schema)
+def preprocessor(df1, df2):
+    return (df1 + df2).assign(column3=lambda x: x.column1 + x.column2)
+
+result = preprocessor(df, df)
+print(result)
+```
+
+Output:
+
+| column1 | column2 | column3 |
+| ------- | ------- | ------- |
+| 2       | -2.6    | -0.6    |
+| 8       | -2.8    | 5.2     |
+| 0       | -5.8    | -5.8    |
+| 20      | -20.2   | -0.2    |
+| 18      | -40.8   | -22.8   |
+
+---
+
+### 4. Decorators Support Sync & Async Functions and Methods
+
+* All pandera decorators (`check_input`, `check_output`, `check_io`, `check_types`) work on:
+
+  * **Synchronous** and **asynchronous** functions.
+  * Class methods (including static and class methods).
+  * Regular functions or coroutines.
+  * Even on metaclasses’ methods.
+
+**Example:**
+
+```python
+import pandera.pandas as pa
+from pandera.typing import DataFrame, Series
+
+class Schema(pa.DataFrameModel):
+    col1: Series[int]
+
+    class Config:
+        strict = True
+
+@pa.check_types
+async def coroutine(df: DataFrame[Schema]) -> DataFrame[Schema]:
+    return df
+
+@pa.check_types
+async def function(df: DataFrame[Schema]) -> DataFrame[Schema]:
+    return df
+
+class SomeClass:
+    @pa.check_output(Schema.to_schema())
+    async def regular_coroutine(self, df) -> DataFrame[Schema]:
+        return df
+
+    @classmethod
+    @pa.check_input(Schema.to_schema(), "df")
+    async def class_coroutine(cls, df):
+        return Schema.validate(df)
+
+    @staticmethod
+    @pa.check_io(df=Schema.to_schema(), out=Schema.to_schema())
+    def static_method(df):
+        return df
+```
+
+
 
 
 
