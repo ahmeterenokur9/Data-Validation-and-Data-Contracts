@@ -1092,6 +1092,108 @@ class SomeClass:
         return df
 ```
 
+# Dropping Invalid Rows in Pandera 
+
+Pandera allows you to **automatically remove rows that fail validation checks** instead of raising errors, by using the `drop_invalid_rows=True` option when creating your schema.
+
+---
+
+### How it works:
+
+* When you call `schema.validate()` with `drop_invalid_rows=True` set on the schema **and** `lazy=True` (to collect all errors), any rows that fail **data-level checks** are **removed** from the returned DataFrame or Series.
+* This **prevents raising errors** for invalid rows — instead, those rows are dropped.
+* Works on:
+
+  * `DataFrameSchema`
+  * `SeriesSchema`
+  * `Column`
+  * `DataFrameModel`
+
+---
+
+### Important notes:
+
+* Row removal is done based on the DataFrame index or MultiIndex of failing rows.
+* If the DataFrame index is **not unique**, incorrect rows might be dropped.
+* `lazy=True` **must be passed to `validate()`** for this to work because lazy validation collects all errors before returning.
+
+---
+
+### Examples
+
+#### 1. Dropping invalid rows with **DataFrameSchema**:
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+
+df = pd.DataFrame({"counter": [1, 2, 3]})
+schema = pa.DataFrameSchema(
+    {"counter": pa.Column(int, checks=[pa.Check(lambda x: x >= 3)])},
+    drop_invalid_rows=True,
+)
+
+schema.validate(df, lazy=True)
+# Returns only the rows where counter >= 3:
+#    counter
+# 2        3
+```
+
+#### 2. Dropping invalid rows with **SeriesSchema**:
+
+```python
+series = pd.Series([1, 2, 3])
+schema = pa.SeriesSchema(
+    int,
+    checks=[pa.Check(lambda x: x >= 3)],
+    drop_invalid_rows=True,
+)
+
+schema.validate(series, lazy=True)
+# Returns: only values >= 3
+# 2    3
+# dtype: int64
+```
+
+#### 3. Dropping invalid rows with **Column**:
+
+```python
+df = pd.DataFrame({"counter": [1, 2, 3]})
+schema = pa.Column(
+    int,
+    name="counter",
+    drop_invalid_rows=True,
+    checks=[pa.Check(lambda x: x >= 3)]
+)
+
+schema.validate(df, lazy=True)
+# Returns rows where counter >= 3
+#    counter
+# 2        3
+```
+
+#### 4. Dropping invalid rows with **DataFrameModel**:
+
+```python
+class MySchema(pa.DataFrameModel):
+    counter: int = pa.Field(in_range={"min_value": 3, "max_value": 5})
+
+    class Config:
+        drop_invalid_rows = True
+
+MySchema.validate(
+    pd.DataFrame({"counter": [1, 2, 3, 4, 5, 6]}), lazy=True
+)
+# Returns rows where counter is between 3 and 5
+#    counter
+# 2        3
+# 3        4
+# 4        5
+```
+
+---
+
+
 
 
 
