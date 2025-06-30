@@ -808,6 +808,138 @@ schema.validate(df)
 ```
 
 
+# Pandera Preprocessing with Parsers
+
+### What are Parsers?
+
+* Parsers let you **preprocess** data (DataFrames, columns, or Series) *before* running validation checks.
+* Useful to **clean, normalize, clip**, or transform data as part of your schema.
+
+---
+
+### Parsing vs Validation
+
+* **Parsing** = transforming raw data into a desired format or state.
+* **Validation** = checking if the data meets the constraints (e.g., types, ranges).
+
+---
+
+### Built-in Parsers Examples
+
+* `coerce=True`: Converts data types before validation.
+* `strict="filter"`: Removes columns not in schema.
+* `add_missing_columns=True`: Adds missing nullable columns or those with defaults.
+
+---
+
+### Custom Parsers
+
+* You can specify **custom parsers** to apply any transformation function on the data *inside* the schema.
+* Parsers receive a `pandas.Series` (for columns) or `DataFrame` (for the whole dataframe) and return the transformed version.
+
+---
+
+### Example: Column-level Parser
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+
+schema = pa.DataFrameSchema({
+    "a": pa.Column(
+        int,
+        parsers=pa.Parser(lambda s: s.clip(lower=0)),  # clip negative values to 0
+        checks=pa.Check.ge(0),
+    )
+})
+
+data = pd.DataFrame({"a": [1, 2, -1]})
+schema.validate(data)
+```
+
+* Input: `[1, 2, -1]`
+* After parsing: `[1, 2, 0]`
+* Validation passes because all values ≥ 0.
+
+---
+
+### Multiple Parsers on a Column
+
+* You can provide a list of parsers, applied in order:
+
+```python
+schema = pa.DataFrameSchema({
+    "string_numbers": pa.Column(
+        str,
+        parsers=[
+            pa.Parser(lambda s: s.str.zfill(10)),  # pad with zeros to length 10
+            pa.Parser(lambda s: s.str[2:]),        # slice from character 3 onward
+        ]
+    ),
+})
+```
+
+---
+
+### DataFrame-level Parsers
+
+* Parsers can be applied to entire DataFrames before column-level parsing.
+
+Example:
+
+```python
+schema = pa.DataFrameSchema(
+    parsers=pa.Parser(lambda df: df.transform("sqrt")),
+    columns={
+        "a": pa.Column(float),
+        "b": pa.Column(float, parsers=pa.Parser(lambda s: s * -1)),
+        "c": pa.Column(float, parsers=pa.Parser(lambda s: s + 1)),
+    }
+)
+
+data = pd.DataFrame({
+    "a": [2.0, 4.0, 9.0],
+    "b": [2.0, 4.0, 9.0],
+    "c": [2.0, 4.0, 9.0],
+})
+
+schema.validate(data)
+```
+
+Output:
+
+| a        | b         | c        |
+| -------- | --------- | -------- |
+| 1.414214 | -1.414214 | 2.414214 |
+| 2.000000 | -2.000000 | 3.000000 |
+| 3.000000 | -3.000000 | 4.000000 |
+
+---
+
+### Using Parsers in DataFrameModel API
+
+```python
+class DFModel(pa.DataFrameModel):
+    a: float
+    b: float
+    c: float
+
+    @pa.dataframe_parser
+    def sqrt(cls, df):
+        return df.transform("sqrt")
+
+    @pa.parser("b")
+    def negate(cls, series):
+        return series * -1
+
+    @pa.parser("c")
+    def plus_one(cls, series):
+        return series + 1
+```
+
+---
+
+
 
 
 
