@@ -664,6 +664,152 @@ class PyarrowModel(pa.DataFrameModel):
 
 
 
+# Pandera Hypothesis Testing 
+
+### 1. Purpose
+
+* Allows you to perform statistical hypothesis tests on your data within schema validation.
+* Example: Testing if the mean of two groups differs significantly.
+
+---
+
+### 2. Installation
+
+* Requires installing Pandera with the `hypothesis` extra:
+
+  ```bash
+  pip install pandera[hypothesis]
+  ```
+
+---
+
+### 3. Example: Two-Sample T-Test
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+from scipy import stats
+
+df = pd.DataFrame({
+    "height_in_feet": [6.5, 7, 6.1, 5.1, 4],
+    "sex": ["M", "M", "F", "F", "F"]
+})
+
+schema = pa.DataFrameSchema({
+    "height_in_feet": pa.Column(
+        float,
+        checks=[
+            pa.Hypothesis.two_sample_ttest(
+                sample1="M",
+                sample2="F",
+                groupby="sex",
+                relationship="greater_than",
+                alpha=0.05,
+                equal_var=True,
+            )
+        ],
+    ),
+    "sex": pa.Column(str)
+})
+
+try:
+    schema.validate(df)
+except pa.errors.SchemaError as exc:
+    print(exc)
+```
+
+* Tests whether the mean height of group "M" is greater than "F".
+* If the test fails, a `SchemaError` is raised.
+
+---
+
+### 4. Custom Hypothesis Tests
+
+* You can define your own test and relationship functions:
+
+```python
+def two_sample_ttest(array1, array2):
+    return stats.ttest_ind(array1, array2)
+
+def null_relationship(stat, pvalue, alpha=0.01):
+    return pvalue / 2 >= alpha
+
+schema = pa.DataFrameSchema({
+    "height_in_feet": pa.Column(
+        float,
+        checks=[
+            pa.Hypothesis(
+                test=two_sample_ttest,
+                samples=["M", "F"],
+                groupby="sex",
+                relationship=null_relationship,
+                relationship_kwargs={"alpha": 0.05},
+            )
+        ],
+    ),
+    "sex": pa.Column(str, checks=pa.Check.isin(["M", "F"]))
+})
+
+schema.validate(df)
+```
+
+---
+
+### 5. Long (Tidy) and Wide Form Data Support
+
+* Pandera primarily supports **long (tidy) data**, where each row is an observation.
+* Also supports **wide form data** for hypothesis tests across columns.
+
+**Long form example:**
+
+```python
+df = pd.DataFrame({
+    "height": [5.6, 7.5, 4.0, 7.9],
+    "group": ["A", "B", "A", "B"],
+})
+
+schema = pa.DataFrameSchema({
+    "height": pa.Column(
+        float,
+        pa.Hypothesis.two_sample_ttest(
+            "A", "B",
+            groupby="group",
+            relationship="less_than",
+            alpha=0.05
+        )
+    ),
+    "group": pa.Column(str, pa.Check(lambda s: s.isin(["A", "B"])))
+})
+
+schema.validate(df)
+```
+
+**Wide form example:**
+
+```python
+df = pd.DataFrame({
+    "height_A": [5.6, 4.0],
+    "height_B": [7.5, 7.9],
+})
+
+schema = pa.DataFrameSchema(
+    columns={
+        "height_A": pa.Column(float),
+        "height_B": pa.Column(float),
+    },
+    checks=pa.Hypothesis.two_sample_ttest(
+        "height_A", "height_B",
+        relationship="less_than",
+        alpha=0.05
+    )
+)
+
+schema.validate(df)
+```
+
+
+
+
 
 
 
