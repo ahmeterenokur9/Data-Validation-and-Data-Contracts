@@ -101,3 +101,116 @@ While built for **pandas**, Pandera also supports:
 
 This enables **scalable data quality checks** on both in-memory and out-of-memory data.
 
+Elbette! Aşağıda verdiğiniz metni **Markdown formatında** yeniden düzenledim. Önemli kısımları **kalın**, kod bloklarını uygun şekilde vurguladım. Her başlığı ayrı tutarak hem kurulum hem de hızlı başlangıç kısmı okunabilir hale getirildi.
+
+---
+
+## 📦 Installation
+
+Get started by installing **Pandera** with pandas support:
+
+### 🔹 With pip:
+
+```bash
+pip install "pandera[pandas]"
+```
+
+### 🔹 With conda:
+
+```bash
+conda install -c conda-forge pandera-pandas
+```
+
+---
+
+###  Optional Extras
+
+Install additional features as needed:
+
+```bash
+pip install 'pandera[hypotheses]'  # hypothesis checks
+pip install 'pandera[io]'          # yaml/script schema io utilities
+pip install 'pandera[strategies]'  # data synthesis strategies
+pip install 'pandera[mypy]'        # enable static type-linting of pandas
+pip install 'pandera[fastapi]'     # fastapi integration
+pip install 'pandera[dask]'        # validate dask dataframes
+pip install 'pandera[pyspark]'     # validate pyspark dataframes
+pip install 'pandera[modin]'       # validate modin dataframes
+pip install 'pandera[modin-ray]'   # validate modin dataframes with ray
+pip install 'pandera[modin-dask]'  # validate modin dataframes with dask
+pip install 'pandera[geopandas]'   # validate geopandas geodataframes
+pip install 'pandera[polars]'      # validate polars dataframes
+```
+
+---
+
+##  Quick Start
+
+Let’s validate a **DataFrame** using **`DataFrameModel`**, the modern and Pydantic-style schema API.
+
+### ✅ Validating a Good Dataset
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+
+# 1. Define your data
+data = pd.DataFrame({
+    "column1": [1, 2, 3],
+    "column2": [1.1, 1.2, 1.3],
+    "column3": ["a", "b", "c"],
+})
+
+# 2. Define a schema
+class Schema(pa.DataFrameModel):
+    column1: int = pa.Field(ge=0)
+    column2: float = pa.Field(lt=10)
+    column3: str = pa.Field(isin=[*"abc"])
+
+    @pa.check("column3")
+    def check_column_length(cls, series: pd.Series) -> pd.Series:
+        """Ensure all values in column3 have a length of 1."""
+        return series.str.len() == 1
+
+# 3. Validate your data
+try:
+    validated_df = Schema.validate(data)
+    print("✅ Validation Successful!")
+    print(validated_df)
+except pa.errors.SchemaError as e:
+    print(f"❌ Validation Error: {e}")
+```
+
+---
+
+### ❌ Validating a Dataset with Errors
+
+```python
+invalid_data = pd.DataFrame({
+    "column1": [-20, 5, 10],       # -20 fails the ge=0 check
+    "column2": [1.1, 15.0, 1.3],   # 15.0 fails the lt=10 check
+    "column3": ["a", "b", "xyz"],  # "xyz" fails isin and length checks
+})
+
+try:
+    # Use lazy=True to collect ALL validation errors at once
+    Schema.validate(invalid_data, lazy=True)
+except pa.errors.SchemaErrors as err:
+    print("❗ Caught validation errors:")
+    print(err.failure_cases)
+```
+
+###  Sample Output
+
+```text
+Caught validation errors:
+  schema_context   column                   check                   check_number  failure_case index
+0         Column  column1  greater_than_or_equal_to(0)             0           -20       0
+1         Column  column2              less_than(10)              0           15.0      1
+2         Column  column3        isin(['a', 'b', 'c'])             0           xyz       2
+3         Column  column3     check_column_length              None        xyz       2
+```
+
+-
+
+
