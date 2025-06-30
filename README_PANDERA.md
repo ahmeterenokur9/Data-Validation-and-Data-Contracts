@@ -6,7 +6,7 @@
 
 ## What is Pandera?
 
-Pandera is a powerful and flexible data validation library for Python, designed to check dataframe-like objects. Think of it as a quality control checkpoint for your data.
+Pandera is a powerful and flexible **data validation** library for Python, designed to check dataframe-like objects. Think of it as a quality control checkpoint for your data.
 
 In any data pipeline, from analytics to machine learning, the quality of your output is determined by the quality of your input. Pandera helps you prevent the "Garbage In, Garbage Out" problem by allowing you to define a clear, readable, and explicit schema, or "contract," for your data. 
 
