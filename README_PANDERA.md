@@ -471,6 +471,198 @@ schema = InputSchema.to_schema()
 validated_df = InputSchema.validate(df)
 ```
 
+# Pandera Data Type Validation 
+
+### 1. Purpose of Data Type Validation
+
+* Ensures input data matches expected types
+* Prevents corrupted data propagating downstream (analytics, ML, etc.)
+* Enables *fail fast* behavior in data pipelines
+
+---
+
+### 2. How to Specify Data Types
+
+* At **column** level in `DataFrameSchema`:
+
+```python
+import pandera.pandas as pa
+
+schema = pa.DataFrameSchema({
+    "column1": pa.Column(int),
+    "column2": pa.Column(float),
+    "column3": pa.Column(str),
+}, index=pa.Index(int))
+```
+
+* At **dataframe-wide** level if all columns share the same type:
+
+```python
+schema_df = pa.DataFrameSchema(dtype=int)
+```
+
+* Equivalent with `DataFrameModel`:
+
+```python
+from pandera.typing import Series, Index
+
+class Model(pa.DataFrameModel):
+    column1: Series[int]
+    column2: Series[float]
+    column3: Series[str]
+    index: Index[int]
+
+class ModelDF(pa.DataFrameModel):
+    class Config:
+        dtype = int
+```
+
+---
+
+### 3. Supported Data Types
+
+* Python built-ins: `int`, `float`, `str`, `bool`, etc.
+* NumPy types: `np.int64`, `np.bool_`, etc.
+* Pandas native types: `pd.StringDtype`, `pd.BooleanDtype`, `pd.DatetimeTZDtype`, etc.
+* String aliases supported by pandas (`"int64"`, `"float64"`, etc.)
+* Pandera's own types like `pa.Int`, `pa.Int64`
+
+**Example of multiple ways to declare integer type:**
+
+```python
+import numpy as np
+
+schema = pa.DataFrameSchema({
+    "col1": pa.Column(int),
+    "col2": pa.Column("int"),
+    "col3": pa.Column("int64"),
+    "col4": pa.Column(np.int64),
+    "col5": pa.Column(pa.Int),
+    "col6": pa.Column(pa.Int64),
+})
+```
+
+---
+
+### 4. Parameterized Data Types (e.g. timezone-aware datetime)
+
+* Pandas dtype objects like `pd.DatetimeTZDtype(unit="ns", tz="UTC")` can be used
+
+**With `DataFrameSchema`:**
+
+```python
+schema = pa.DataFrameSchema({
+    "dt": pa.Column(pd.DatetimeTZDtype(unit="ns", tz="UTC"))
+})
+```
+
+**With `DataFrameModel` and Python type annotations:**
+
+```python
+from typing import Annotated
+
+class DateTimeModel(pa.DataFrameModel):
+    dt: Series[Annotated[pd.DatetimeTZDtype, "ns", "UTC"]]
+```
+
+or use `Field` with `dtype_kwargs`:
+
+```python
+class DateTimeModel(pa.DataFrameModel):
+    dt: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={"unit": "ns", "tz": "UTC"})
+```
+
+---
+
+### 5. Data Type Coercion
+
+* Pandera primarily **validates** types but does not mutate data
+* Use `coerce=True` in schema or column to **convert** data to the specified type during validation:
+
+```python
+schema = pa.DataFrameSchema(
+    {
+        "column": pa.Column(int, coerce=True)
+    }
+)
+validated_df = schema.validate(df)  # df values coerced to int
+```
+
+* Coercion works similarly on `DataFrameModel` fields via `Field(coerce=True)` or config
+
+---
+
+### 6. Nullable and Data Types
+
+* `nullable=True` allows `NaN`/`None` in columns
+* But if dtype **does not support nulls**, validation fails regardless of `nullable=True`
+* Type checks run **before** nullable checks in validation pipeline
+
+---
+
+### 7. Support for Python `typing` Module Generic Types
+
+* Validate columns containing objects like:
+
+  * `Dict[K, V]`
+  * `List[T]`
+  * `Tuple[T, ...]`
+  * `TypedDict`
+  * `NamedTuple`
+
+* Uses **typeguard** under the hood (if installed) for deep validation
+
+* Without `typeguard >=3.0.0`, only first item is checked in collections
+
+**Example schema with typing generics:**
+
+```python
+from typing import Dict, List, Tuple, TypedDict, NamedTuple
+import pandera.pandas as pa
+
+class PointDict(TypedDict):
+    x: float
+    y: float
+
+class PointTuple(NamedTuple):
+    x: float
+    y: float
+
+schema = pa.DataFrameSchema({
+    "dict_col": pa.Column(Dict[str, int]),
+    "list_col": pa.Column(List[float]),
+    "tuple_col": pa.Column(Tuple[int, str, float]),
+    "typed_dict_col": pa.Column(PointDict),
+    "named_tuple_col": pa.Column(PointTuple),
+})
+```
+
+---
+
+### 8. PyArrow Data Types Support
+
+* Pandera supports PyArrow dtypes via pandas ArrowDtype wrappers
+
+```python
+import pyarrow
+import pandas as pd
+import pandera.pandas as pa
+
+schema = pa.DataFrameSchema({
+    "pyarrow_col": pa.Column(pyarrow.float64()),
+    "pandas_str_alias": pa.Column("float64[pyarrow]"),
+    "pandas_dtype": pa.Column(pd.ArrowDtype(pyarrow.float64()))
+})
+
+from typing import Annotated
+
+class PyarrowModel(pa.DataFrameModel):
+    pyarrow_dtype: pyarrow.float64
+    pandas_dtype: Annotated[pd.ArrowDtype, pyarrow.float64()]
+    pandas_dtype_kwargs: pd.ArrowDtype = pa.Field(dtype_kwargs={"pyarrow_dtype": pyarrow.float64()})
+```
+
+
 
 
 
