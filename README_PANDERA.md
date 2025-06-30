@@ -1,4 +1,4 @@
-# pandera: A Data Validation Toolkit for Data Scientists & Engineers
+# Pandera: A Data Validation Toolkit for Data Scientists & Engineers
 
 ![Intro](images/pandera.png)
 
