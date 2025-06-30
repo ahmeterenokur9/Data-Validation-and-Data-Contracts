@@ -214,3 +214,143 @@ Caught validation errors:
 -
 
 
+
+##  DataFrameSchema: Validating  DataFrames with Confidence
+
+`DataFrameSchema` is a core feature of **Pandera**, allowing you to define a **clear, explicit contract** for your DataFrames. It validates column types, checks value constraints, handles missing or extra data, and more.
+
+---
+
+###  Basic Usage
+
+```python
+import pandas as pd
+import pandera.pandas as pa
+
+schema = pa.DataFrameSchema({
+    "column1": pa.Column(int),
+    "column2": pa.Column(float, pa.Check(lambda s: s < 10)),
+    "column3": pa.Column(str, checks=[
+        pa.Check.str_startswith("value"),
+        pa.Check.str_length(6),
+    ]),
+}, index=pa.Index(int), coerce=True)
+```
+
+* **Column types** are enforced (e.g., `int`, `float`, `str`)
+* **Checks** ensure valid content (`< 10`, string patterns, etc.)
+* **Index** type can be validated
+* `coerce=True` tries to automatically convert values to the correct type
+
+---
+
+###  Null Handling
+
+By default, nulls **are not allowed**. You must opt-in:
+
+```python
+schema = pa.DataFrameSchema({
+    "column1": pa.Column(float, nullable=True)
+})
+```
+
+---
+
+###  Type Coercion
+
+You can force Pandera to coerce column types before validation:
+
+```python
+df = pd.DataFrame({"column1": [1, 2, 3]})
+schema = pa.DataFrameSchema({"column1": pa.Column(str, coerce=True)})
+validated_df = schema.validate(df)
+```
+
+---
+
+###  Strict Column Enforcement
+
+Control what happens with unexpected or missing columns:
+
+* `strict=True`: Only allow schema-defined columns
+* `strict="filter"`: Drop extra columns
+* `add_missing_columns=True`: Add missing columns with default or NaN
+
+---
+
+###  Column Order Validation
+
+Enforce column order if needed (important in ML pipelines):
+
+```python
+schema = pa.DataFrameSchema(
+    {"a": pa.Column(int), "b": pa.Column(int)},
+    ordered=True
+)
+```
+
+---
+
+###  Multi-Column Constraints
+
+Ensure that **combinations** of columns are unique:
+
+```python
+schema = pa.DataFrameSchema(
+    {"a": pa.Column(int), "b": pa.Column(int)},
+    unique=["a", "b"]
+)
+```
+
+---
+
+###  Transforming Schemas
+
+You can programmatically **add**, **remove**, or **update** schema elements:
+
+```python
+schema = schema.add_columns({
+    "new_col": pa.Column(str, default="default_value")
+})
+```
+
+---
+
+###  Regex Column Matching
+
+Validate **groups of columns** using regex:
+
+```python
+schema = pa.DataFrameSchema({
+    "metric_.+": pa.Column(float, regex=True)
+})
+```
+
+---
+
+###  Index & MultiIndex Support
+
+You can also define validation rules for index or multi-index structures:
+
+```python
+schema = pa.DataFrameSchema(
+    {"value": pa.Column(int)},
+    index=pa.Index(str, pa.Check.str_startswith("index_"))
+)
+```
+
+---
+
+###  Standalone Column Validation
+
+You don't need a full schema to validate one or two columns:
+
+```python
+col_schema = pa.Column(int, name="column1")
+col_schema.validate(df)
+```
+
+---
+
+
+
