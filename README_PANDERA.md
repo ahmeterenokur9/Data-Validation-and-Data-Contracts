@@ -350,7 +350,128 @@ col_schema = pa.Column(int, name="column1")
 col_schema.validate(df)
 ```
 
+# Key Points on Pandera `DataFrameModel`
+
+### 1. What is `DataFrameModel`?
+
+* Class-based API for defining dataframe schemas
+* Inspired by Pydantic models
+* Enables type-safe, declarative data validation
+
 ---
+
+### 2. Defining a Schema
+
+```python
+from pandera.typing import Series
+import pandera.pandas as pa
+
+class InputSchema(pa.DataFrameModel):
+    year: Series[int] = pa.Field(gt=2000, coerce=True)
+    month: Series[int] = pa.Field(ge=1, le=12, coerce=True)
+```
+
+---
+
+### 3. Validating DataFrames
+
+* Use the `@pa.check_types` decorator on functions with typed DataFrames
+* Or validate directly with `InputSchema.validate(df)`
+
+---
+
+### 4. Optional Fields
+
+* Use `typing.Optional` to make a column optional
+
+```python
+from typing import Optional
+class Schema(pa.DataFrameModel):
+    a: Series[str]
+    b: Optional[Series[int]]  # Optional column
+```
+
+---
+
+### 5. Schema Inheritance
+
+* Build complex schemas by inheriting base schemas
+
+```python
+class Base(pa.DataFrameModel):
+    year: Series[int]
+
+class Extended(Base):
+    passengers: Series[int]
+```
+
+---
+
+### 6. Config Class
+
+* Control schema-wide options like coercion, strictness
+
+```python
+class Schema(pa.DataFrameModel):
+    year: Series[int] = pa.Field(gt=2000)
+
+    class Config:
+        coerce = True
+        strict = True
+```
+
+---
+
+### 7. Custom Checks
+
+* Add class methods with `@pa.check("column_name")` for custom validation
+
+```python
+class Schema(pa.DataFrameModel):
+    age: Series[int]
+
+    @pa.check("age")
+    def age_check(cls, series):
+        return series >= 18
+```
+
+---
+
+### 8. Aliases for Columns
+
+* Use `alias` in `Field` for columns that aren’t valid Python identifiers
+
+```python
+class Schema(pa.DataFrameModel):
+    col_2020: Series[int] = pa.Field(alias="2020")
+```
+
+---
+
+### 9. MultiIndex Support
+
+* Use `Index` type and configure MultiIndex in `Config`
+
+```python
+from pandera.typing import Index
+
+class Schema(pa.DataFrameModel):
+    year: Index[int] = pa.Field(gt=2000)
+
+    class Config:
+        multiindex_name = "time"
+```
+
+---
+
+### 10. Converting to DataFrameSchema & Validate
+
+```python
+schema = InputSchema.to_schema()
+validated_df = InputSchema.validate(df)
+```
+
+
 
 
 
