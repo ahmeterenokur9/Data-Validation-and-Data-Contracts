@@ -1,13 +1,21 @@
-from pandera import DataFrameSchema, Column, Check
+# Use this when validating a specific column within a full DataFrame (table)
+
 import pandas as pd
+from pandera import DataFrameSchema, Column, Check
 
+# Create a DataFrame
 df = pd.DataFrame({
-    "yaş": [25, 30, 35]
+    "age": [21, 25, 30],
+    "name": ["Ali", "Bob", "Charlie"]
 })
 
-# DataFrame için schema: yaş sütunu int ve pozitif olacak
+# Define schema: age must be >= 18 and name must be a string of length > 0
 schema = DataFrameSchema({
-    "yaş": Column(int, checks=Check.ge(0))
+    "age": Column(int, Check.ge(18)),
+    "name": Column(str, Check.str_length(min_value=1))
 })
 
-schema.validate(df)
+# Validate the DataFrame
+validated_df = schema.validate(df)
+print(validated_df)
+
