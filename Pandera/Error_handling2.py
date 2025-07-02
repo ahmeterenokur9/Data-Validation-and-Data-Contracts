@@ -5,12 +5,12 @@ from pandera import DataFrameSchema, Column, Check, errors
 
 df = pd.DataFrame({
     "age": [21, 15, 30],
-    "name": ["Alice", "", "Bob"]
+    "name": ["Alice", "A", "Bob"]
 })
 
 schema = DataFrameSchema({
     "age": Column(int, Check.ge(18)),
-    "name": Column(str, Check.str_length(min_value=1))
+    "name": Column(str, Check.str_length(min_value=2))
 })
 
 try:
