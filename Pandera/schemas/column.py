@@ -1,7 +1,6 @@
-# Use this when validating a specific column within a full DataFrame (table)
-
 import pandas as pd
-from pandera import DataFrameSchema, Column, Check
+import pandera.pandas as pa
+from pandera import Check
 
 # Create a DataFrame
 df = pd.DataFrame({
@@ -10,9 +9,9 @@ df = pd.DataFrame({
 })
 
 # Define schema: age must be >= 18 and name must be a string of length > 0
-schema = DataFrameSchema({
-    "age": Column(int, Check.ge(18)),
-    "name": Column(str, Check.str_length(min_value=1))
+schema = pa.DataFrameSchema({
+    "age": pa.Column(int, Check.ge(18)),
+    "name": pa.Column(str, Check.str_length(min_value=1))
 })
 
 # Validate the DataFrame
