@@ -1,6 +1,7 @@
 import pandera.pandas as pa
 from pandera.typing import Series
 
+# DATA CONTRACT
 class SensorData(pa.DataFrameModel):
   id : Series[str] = pa.Field(
       str_startswith="PWR-",
