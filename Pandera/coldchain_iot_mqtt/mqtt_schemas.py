@@ -3,6 +3,8 @@ from pandera.typing import Series, DateTime
 
 print("Defining Cold Chain Logistics Sensor Data Contract...")
 
+
+# Data Contract
 class ColdChainSensorData(pa.DataFrameModel):
   truck_id: Series[str] = pa.Field(
       str_startswith="TRUCK-",
