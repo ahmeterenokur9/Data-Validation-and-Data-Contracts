@@ -5,10 +5,12 @@ import pandera.pandas as pa
 
 from mqtt_schemas import ColdChainSensorData
 
+# mqtt configuration
 MQTT_BROKER = "broker.hivemq.com"
 MQTT_PORT = 1883
 MQTT_TOPIC = "iot/logistics/coldchain/telemetry"
 
+# connection check
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print(f"[Subscriber] Successfully connected to MQTT Broker: {MQTT_BROKER}")
@@ -24,7 +26,7 @@ def on_message(client, userdata, msg):
     try:
         data_packet = json.loads(payload)
         df = pd.DataFrame([data_packet])
-        ColdChainSensorData.validate(df)
+        ColdChainSensorData.validate(df)  # DATA VALIDATION
         print("✅ [Subscriber] Data is valid and accepted.")
 
     except json.JSONDecodeError:
