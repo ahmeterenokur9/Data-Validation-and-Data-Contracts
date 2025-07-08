@@ -7,6 +7,8 @@ from data_contract import SensorData
 app = Flask(__name__)
 
 @app.route("/data/power", methods=["POST"])
+
+# data validation process
 def validate():
   data = request.get_json()
   print(f"\n[sever] Data: {data}")
@@ -26,6 +28,7 @@ def validate():
         "error_details" : error_report
     }), 400
     
+# Starting the Server
 if __name__ == "__main__":
   print("[Server] Flask server is starting on port 5001...")
   app.run(port=5001)
