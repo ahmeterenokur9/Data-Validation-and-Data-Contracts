@@ -2,8 +2,9 @@ import random
 import time
 import requests
 
-SERVER_URL = 'http://127.0.0.1:5001/data/power'
+SERVER_URL = 'http://127.0.0.1:5001/data/power' # the url that data will be send
 
+# generating random data
 def generate_sensor_reading():
     
     reading = {
