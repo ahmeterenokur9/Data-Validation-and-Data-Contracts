@@ -57,13 +57,3 @@ def generate_sensor_data(num_records: int = 1, error_rate: float = 0.1) -> pd.Da
         records.append(record)
 
     return pd.DataFrame(records)
-
-if __name__ == "__main__":
-    print("Generating 10 normal records:")
-    df_normal = generate_sensor_data(num_records=10, error_rate=0.0)
-    print(df_normal)
-    print("\n" + "="*50 + "\n")
-
-    print("Generating 10 records with 50% error rate:")
-    df_error = generate_sensor_data(num_records=10, error_rate=0.5)
-    print(df_error)
