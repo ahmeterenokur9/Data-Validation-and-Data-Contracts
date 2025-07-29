@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel Dokümantasyonu: Sistemin Kontrol Merkezi</title>
+    <!-- Modern Font ve İkonlar -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Kod renklendirme için Prism.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-color: #2c2c2c;
+            --text-color: #f0f0f0;
+            --primary-color: #4ecca3;
+            --secondary-color: #3b3b3b;
+            --border-color: #444;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        header p {
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+        .card {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        h3 {
+            font-size: 1.5rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+        ol.journey {
+            list-style: none;
+            counter-reset: journey-counter;
+            padding-left: 0;
+        }
+        ol.journey li {
+            counter-increment: journey-counter;
+            background-color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 6px;
+            position: relative;
+            border-left: 4px solid var(--primary-color);
+        }
+        ol.journey li::before {
+            content: counter(journey-counter);
+            position: absolute;
+            left: -22px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--bg-color);
+        }
+        li strong {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        pre[class*="language-"] {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="ph-bold ph-wrench"></i> Admin Panel Dokümantasyonu</h1>
+            <p>Sistemin Dinamik Kalbinin Kontrolü</p>
+        </header>
+
+        <main>
+            <section class="card">
+                <h2><i class="ph ph-compass"></i> Genel Bakış: Sistemin Kontrol Merkezi</h2>
+                <p>
+                    Admin Paneli (<code>admin.html</code>), bu projenin sadece bir arayüzü değil, aynı zamanda tüm veri işleme boru hattının (pipeline) beynini ve kurallarını yöneten dinamik bir kontrol merkezidir. Bu panel sayesinde, sunucuyu yeniden başlatmadan veya herhangi bir yapılandırma dosyasını manuel olarak düzenlemeden, sistemin çalışma şekli anlık olarak değiştirilebilir.
+                </p>
+                <p>
+                    Bu doküman, panelde yapılan basit bir tıklamanın, arka planda sistemin kalbine nasıl bir etki ettiğini ve bu etkinin tüm bileşenlere (diğer kullanıcılara ait dashboard'lar dahil) nasıl yayıldığını adım adım anlatmaktadır.
+                </p>
+            </section>
+            
+            <section class="card">
+                <h2><i class="ph ph-toggle-left"></i> Arayüz Bileşenleri ve Kontrol Ettikleri Sistem Parçaları</h2>
+                <ul>
+                    <li>
+                        <strong>MQTT Configuration:</strong> Bu bölüm, sistemin ana veri kaynağı olan MQTT Broker ile olan bağlantısını yönetir. Değiştirildiğinde, <code>mqtt_manager.py</code>'nin hangi sunucuya bağlanacağını belirler.
+                    </li>
+                    <li>
+                        <strong>Topic Mappings (Konu Eşleştirmeleri):</strong> Bu, sistemin en kritik parçasıdır. Her bir satır, bir veri akışının tüm yolculuğunu tanımlar:
+                        <ul>
+                            <li><strong>Source Topic:</strong> Ham verinin hangi konudan dinleneceği.</li>
+                            <li><strong>Validated Topic:</strong> Veri geçerliyse, hangi konuya yeniden yayınlanacağı.</li>
+                            <li><strong>Failed Topic:</strong> Veri hatalıysa, hata raporunun hangi konuya yayınlanacağı.</li>
+                            <li><strong>Schema:</strong> Gelen verinin hangi kurallara göre doğrulanacağı.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Schema File Editor:</strong> Veri doğrulama kurallarının (şemaların) kendisini yönetir. Burada yeni bir kural dosyası oluşturmak veya mevcut bir kuralı (örn: bir sıcaklık aralığını) değiştirmek mümkündür.
+                    </li>
+                </ul>
+            </section>
+
+            <section class="card">
+                <h2><i class="ph ph-path"></i> Değişikliğin Yolculuğu: Bir Tıklamanın Anatomisi</h2>
+                <p><strong>Senaryo:</strong> Kullanıcı, <code>/sensor2</code> için "Validated Topic" adını <code>/sensor2/validated</code> yerine <code>/sensor2/passed</code> olarak değiştiriyor ve "Save Configuration" butonuna basıyor.</p>
+                
+                <ol class="journey">
+                    <li>
+                        <strong>Adım 1: Tıklama ve Veri Toplama (Client-Side | <code>admin.html</code>)</strong>
+                        Kullanıcı butona bastığında, formun 'submit' olayı tetiklenir. JavaScript, arayüzdeki tüm girdileri (MQTT ayarları ve tüm konu eşleştirme satırları) okuyarak JSON formatında bir veri yapısı oluşturur.
+                        <pre><code class="language-javascript">// admin.html
+document.getElementById('mqtt-config-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Sayfanın yeniden yüklenmesini engelle
+    // ...
+    const mappings = Array.from(mappingElements).map(item => ({
+        source: item.querySelector('.mapping-source').value,
+        validated: item.querySelector('.mapping-validated').value, // -> "/sensor2/passed"
+        failed: item.querySelector('.mapping-failed').value,
+        schema: item.querySelector('.mapping-schema').value
+    }));
+    // ... API isteği hazırlığı
+});</code></pre>
+                    </li>
+                    <li>
+                        <strong>Adım 2: API İsteği (Client ➔ Server | <code>admin.html</code> ➔ <code>main.py</code>)</strong>
+                        JavaScript, hazırladığı JSON verisini, <code>fetch</code> API'si aracılığıyla backend'deki <code>/api/topic-mappings</code> adresine bir <code>POST</code> isteği olarak gönderir.
+                        <pre><code class="language-javascript">// admin.html
+await apiCall('/api/topic-mappings', { 
+    method: 'POST', 
+    headers: { 'Content-Type': 'application/json' }, 
+    body: JSON.stringify(mappings) 
+});</code></pre>
+                    </li>
+                     <li>
+                        <strong>Adım 3: İsteğin Karşılanması ve Kayıt (Server-Side | <code>main.py</code>)</strong>
+                        FastAPI, bu isteği alır ve <code>update_topic_mappings</code> fonksiyonunu çalıştırır. Bu fonksiyon, ilk olarak <code>config.json</code> dosyasını okur, içindeki <code>topic_mappings</code> listesini gelen yeni liste ile günceller ve değişiklikleri kalıcı olacak şekilde diske geri yazar. Artık sistemin "tek doğruluk kaynağı" güncellenmiştir.
+                        <pre><code class="language-python"># main.py
+@app.post("/api/topic-mappings")
+async def update_topic_mappings(mappings: List[TopicMapping]):
+    config = read_config()
+    config["topic_mappings"] = [m.dict() for m in mappings]
+    write_config(config) # Değişiklikler config.json'a yazıldı!
+    # ...
+</code></pre>
+                    </li>
+                    <li>
+                        <strong>Adım 4: Sistemin Kalbine Müdahale: MQTT İstemcisinin Yeniden Başlatılması (Server-Side | <code>main.py</code>)</strong>
+                        Ayarlar kaydedildikten hemen sonra, <code>restart_mqtt_client()</code> fonksiyonu çağrılır. Bu, bir "beyin nakli" işlemine benzer:
+                        <ol>
+                            <li>Çalışmakta olan mevcut <code>MQTTManager</code> istemcisi durdurulur.</li>
+                            <li><strong>En kritik adım:</strong> Yeni bir <code>MQTTManager</code> nesnesi oluşturulur. Bu yeni nesne, başlatıldığı anda diskten <strong>en güncel <code>config.json</code> dosyasını</strong> okur.</li>
+                            <li>Yeni istemci, artık <code>/sensor2/passed</code> kuralını bilerek çalışmaya başlar.</li>
+                        </ol>
+                        <pre><code class="language-python"># main.py
+def restart_mqtt_client():
+    if mqtt_client:
+        mqtt_client.stop() # Eski istemciyi durdur
+        mqtt_thread.join()
+    # ... Yeni istemci güncel ayarlarla başlatılır ...
+    mqtt_client.start()</code></pre>
+                    </li>
+                     <li>
+                        <strong>Adım 5: Değişikliği Evrene Duyurma: WebSocket Yayını (Server-Side | <code>main.py</code>)</strong>
+                        Backend, kendi kendini güncelledikten sonra, diğer tüm istemcileri (açık olan tüm Dashboard'ları) bu değişiklikten haberdar etmelidir. <code>ConnectionManager</code> üzerinden <code>"config_updated"</code> mesajını yayınlar.
+                        <pre><code class="language-python"># main.py
+@app.post("/api/topic-mappings")
+async def update_topic_mappings(...):
+    # ... (önceki adımlar)
+    await manager.broadcast("config_updated") # Tüm bağlı istemcilere bildir!
+    return {"message": "Topic mappings updated successfully."}</code></pre>
+                    </li>
+                     <li>
+                        <strong>Adım 6: Dashboard'un Mesajı Alması (Client-Side | <code>app.js</code>)</strong>
+                        Dashboard, WebSocket üzerinden gelen <code>"config_updated"</code> mesajını duyar ve <code>onmessage</code> olayı tetiklenir.
+                        <pre><code class="language-javascript">// app.js
+ws.onmessage = (event) => {
+    if (event.data === 'config_updated') {
+        initializeApp(); // Her şeyi yeniden başlat!
+    }
+};</code></pre>
+                    </li>
+                    <li>
+                        <strong>Adım 7: Dashboard'un Kendini Yenilemesi (Client-Side | <code>app.js</code>)</strong>
+                        Tetiklenen <code>initializeApp()</code> fonksiyonu, Dashboard'un kendini yeniden yapılandırmasını sağlar:
+                        <ol>
+                            <li>Mevcut MQTT bağlantısını güvenli bir şekilde kapatır.</li>
+                            <li>Sunucudaki <code>/api/topic-mappings</code> adresine yeni bir <code>GET</code> isteği yaparak <strong>en güncel</strong> konu listesini (içinde <code>/sensor2/passed</code> olan) alır.</li>
+                            <li>Bu yeni listeye göre abone olacağı konuları belirler ve MQTT Broker'a yeniden bağlanır.</li>
+                            <li>Arayüzdeki "Source Topics" filtrelerini de yeni listeye göre yeniden oluşturur.</li>
+                        </ol>
+                    </li>
+                    <li>
+                        <strong>Adım 8: Senkronizasyon Tamamlandı!</strong>
+                        Tüm sistem (Backend doğrulayıcı ve tüm Frontend izleyiciler), hiçbir sayfa yenilemesi olmadan, yeni kurallarla çalışmaya devam eder. Artık <code>sensor2</code>'den gelen geçerli veriler <code>/sensor2/passed</code> konusuna yayınlanacak ve Dashboard bu konuyu dinleyecektir.
+                    </li>
+                </ol>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html> 

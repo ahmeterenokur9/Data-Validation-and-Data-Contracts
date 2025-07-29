@@ -1,0 +1,44 @@
+{
+    "columns": {
+        "sensor_id": {
+            "dtype": "str",
+            "checks": {
+                "equal_to": "sensor3"
+            },
+            "nullable": false
+        },
+        "timestamp": {
+            "dtype": "str",
+            "checks": {
+                "str_matches": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$"
+            },
+            "nullable": false
+        },
+        "voltage": {
+            "dtype": "float",
+            "checks": {
+                "greater_than_or_equal_to": 110,
+                "less_than_or_equal_to": 230
+            },
+            "nullable": false
+        },
+        "current": {
+            "dtype": "float",
+            "checks": {
+                "greater_than_or_equal_to": 0,
+                "less_than_or_equal_to": 20
+            },
+            "nullable": false
+        },
+        "power": {
+            "dtype": "float",
+            "checks": {
+                "greater_than_or_equal_to": 0,
+                "less_than_or_equal_to": 5000
+            },
+            "nullable": false
+        }
+    },
+    "strict": true,
+    "coerce": true
+} 

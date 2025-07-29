@@ -1,0 +1,26 @@
+{
+  "mqtt_settings": {
+    "broker": "broker.hivemq.com",
+    "port": 1883
+  },
+  "topic_mappings": [
+    {
+      "source": "/sensor1",
+      "validated": "/sensor1/gecerli",
+      "failed": "/sensor1/failed",
+      "schema": "schemas/sensor1.json"
+    },
+    {
+      "source": "/sensor2",
+      "validated": "/sensor2/gecerli",
+      "failed": "/sensor2/failed",
+      "schema": "schemas/sensor2.json"
+    },
+    {
+      "source": "/sensor3",
+      "validated": "/sensor3/gecerli",
+      "failed": "/sensor3/failed",
+      "schema": "schemas/sensor3.json"
+    }
+  ]
+}
