@@ -297,7 +297,10 @@ document.addEventListener('DOMContentLoaded', () => {
         client.on('error', (err) => {
             updateConnectionStatus('error', 'Connection Error');
             console.error('MQTT Connection Error:', err);
-            client.end(); // Close connection on error
+            // client.end() öğesini kaldırdık. Bu, kütüphanenin otomatik yeniden bağlanma
+            // özelliğinin devreye girmesine izin verir. "Yetki yok" hatası gibi
+            // kalıcı hatalar zaten zaman aşımına uğrayacak ve döngüye girmeyecektir.
+            // client.end(); // Close connection on error
         });
 
         client.on('close', () => {
@@ -360,11 +363,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Disconnect old client if it exists before creating a new one
             if (client && client.connected) {
                 client.end(true, () => {
-                    if (topicsToSubscribe.length > 0) {
-                        connectToBroker(topicsToSubscribe);
-                    } else {
-                        updateConnectionStatus('disconnected', 'No topics configured.');
-                    }
+                    console.log('Old MQTT client disconnected. Re-initializing in 1 second...');
+                    // Hızlı yeniden bağlanma nedeniyle oluşan "Not authorized" hatasını önlemek için 1 saniyelik gecikme ekliyoruz.
+                    setTimeout(() => {
+                        if (topicsToSubscribe.length > 0) {
+                            connectToBroker(topicsToSubscribe);
+                        } else {
+                            updateConnectionStatus('disconnected', 'No topics configured.');
+                        }
+                    }, 1000); 
                 });
             } else {
                 if (topicsToSubscribe.length > 0) {
@@ -395,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ws.onmessage = (event) => {
             if (event.data === 'config_updated') {
                 console.log('Configuration has changed on the server. Re-initializing...');
-                // No need to disconnect here, initializeApp will handle it.
+                // initializeApp zaten bağlantıyı güvenli bir şekilde yönetiyor.
                 initializeApp();
             }
         };
