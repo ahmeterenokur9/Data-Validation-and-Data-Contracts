@@ -19,7 +19,7 @@ Validated and failed data points are intelligently separated and enriched with m
 - [Tech Stack](#️-tech-stack)
 - [Architecture & Detailed Data Flow](#️-architecture--detailed-data-flow)
 - [Getting Started](#-getting-started)
-- [Usage](#-usage)
+- [Usage](#️-usage)
 - [Project Structure](#-project-structure)
 - [Future Work & Known Limitations](#-future-work--known-limitations)
 
