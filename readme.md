@@ -13,14 +13,15 @@ This project treats data validation not just as a simple check, but as a formal 
 
 ### Our Tool of Choice: Pandera
 
-To implement these data contracts, we use **Pandera**, a powerful and flexible data validation library for Python. Pandera was chosen for several key reasons that make it ideal for this dynamic pipeline:
+To implement these data contracts, we use **Pandera**, a powerful and flexible data validation library for Python. Pandera was chosen because its features align perfectly with the needs of a robust data pipeline:
 
--   **Declarative and Readable Schemas**: Pandera allows us to define complex validation rules in a simple, human-readable format. We've taken this a step further by defining our schemas in `.json` files, making them completely independent of the Python code.
--   **Dynamic Schema Generation**: The system dynamically loads these JSON files and constructs validation schemas on the fly. This means schemas can be updated via the Admin Panel, and the changes are applied instantly without requiring a server restart.
--   **Rich Validation Rules**: It provides a wide range of built-in checks, from simple data type enforcement (`float`, `str`) to complex rules like value ranges (`greater_than`, `less_than`), regular expression matching, and nullability checks.
--   **Detailed Error Reporting**: When validation fails, Pandera doesn't just reject the data; it provides a detailed report explaining exactly which field failed, what rule it violated, and what the problematic value was. Our system captures this report and routes it for immediate analysis.
+-   **Deep Integration with Pandas**: Pandera is designed from the ground up to validate Pandas DataFrames, which are the industry standard for data manipulation in Python. This allows us to perform validation directly on the data structures we use for processing, making the integration seamless and efficient.
+-   **Declarative and Expressive API**: Schemas are defined in a clear, declarative way. This makes the validation rules easy to read, write, and maintain. This declarative nature is what allows our project to represent these rules in an external `.json` format, completely decoupling them from the application logic.
+-   **Rich Set of Built-in Checks**: It provides a comprehensive suite of validation rules out-of-the-box, covering everything from simple data type enforcement (`float`, `str`, `datetime`) to complex statistical properties and value ranges (`greater_than`, `in_range`, `str_matches`).
+-   **Informative and Actionable Errors**: When validation fails, Pandera doesn't just return a boolean `False`. It raises a `SchemaErrors` exception that contains a detailed DataFrame of every failure, including the problematic data, the column it occurred in, and the specific check that failed. This structured error reporting is critical for our system to generate meaningful failure messages.
+-   **Extensibility**: Pandera allows for the creation of custom, complex validation checks, providing an escape hatch for any business logic that isn't covered by the built-in rules.
 
-By leveraging Pandera, we transform our data pipeline from a passive receiver of information into an active guardian of data quality.
+By leveraging these core features of Pandera, we transform our data pipeline from a passive receiver of information into an active guardian of data quality.
 
 ## 📖 Overview
 
@@ -54,22 +55,29 @@ Validated and failed data points are intelligently separated and enriched with m
 
 ## 🛠️ Tech Stack
 
-This project integrates a variety of powerful tools and libraries to achieve its goals.
+This project integrates a variety of powerful tools and libraries. The entire environment is managed by Docker Compose, ensuring version consistency and easy setup.
 
-| Category      | Technology / Library | Purpose                                                                          |
-|---------------|----------------------|----------------------------------------------------------------------------------|
-| **Backend**   | Python               | The core programming language for the application logic.                         |
-|               | FastAPI              | A modern, high-performance web framework for building APIs.                      |
-|               | Paho-MQTT            | A Python client library for connecting to the MQTT broker.                       |
-|               | Pandera              | A data validation library used to enforce schema rules on incoming sensor data.  |
-|               | Uvicorn              | A lightning-fast ASGI server that runs the FastAPI application.                  |
-| **Frontend**  | HTML / CSS           | Standard languages for structuring and styling the web-based interfaces.         |
-|               | JavaScript           | Powers the interactivity of the Admin Panel and the Live Dashboard.              |
-|               | MQTT.js              | A JavaScript client library for connecting the Live Dashboard to the MQTT broker.|
-| **Data & Ops**| Docker & Docker Compose | Containerizes the application and all its services for easy, reliable deployment.|
-|               | InfluxDB             | A time-series database for persistently storing all validated and failed messages.|
-|               | Prometheus           | An open-source monitoring system for collecting application performance metrics. |
-|               | Grafana              | An open-source platform for visualizing data and creating powerful alerts.       |
+| Category                  | Technology / Library  | Version           | Purpose                                                                          |
+| :------------------------ | :-------------------- | :---------------- | :------------------------------------------------------------------------------- |
+| **Backend (Python)**      | Python                | `3.10`            | The core programming language for the application logic.                         |
+|                           | FastAPI               | `0.116.1`         | A modern, high-performance web framework for building APIs.                      |
+|                           | Uvicorn               | `0.35.0`          | A lightning-fast ASGI server that runs the FastAPI application.                  |
+|                           | Paho-MQTT             | `2.1.0`           | A Python client library for connecting to the MQTT broker for data ingestion.    |
+|                           | Pandera               | `0.25.0`          | A data validation library used to enforce schema rules on incoming data.         |
+|                           | Pandas                | `2.3.1`           | The core library for data manipulation, used as a backbone for Pandera.          |
+|                           | InfluxDB Client       | `1.49.0`          | The official Python client for writing data points to InfluxDB.                  |
+|                           | Prometheus Client     | `0.22.1`          | A library for instrumenting the application and exposing metrics to Prometheus.  |
+|                           | Websockets            | `15.0.1`          | Enables real-time, two-way communication between the server and clients.         |
+|                           | Jinja2                | `3.1.6`           | A templating engine used by FastAPI to render HTML pages.                        |
+|                           | AIOFiles              | `24.1.0`          | Provides asynchronous file I/O, used for non-blocking file operations.           |
+|                           | Python-Multipart      | `0.0.20`          | A streaming multipart parser, required by FastAPI for form data.                 |
+| **Frontend**              | JavaScript (ES6+)     | -                 | Powers the interactivity of the Admin Panel and the Live Dashboard.              |
+|                           | MQTT.js               | -                 | A JavaScript client library for connecting the Live Dashboard to the MQTT broker.|
+|                           | HTML5 / CSS3          | -                 | Standard languages for structuring and styling the web interfaces.               |
+| **Infrastructure & Data** | Docker & Docker Compose | -               | Containerizes the application and all services for easy, reliable deployment.  |
+|                           | InfluxDB              | `2.7`             | A time-series database for persistently storing all message and error data.      |
+|                           | Prometheus            | `v2.x`            | An open-source monitoring system for collecting application performance metrics. |
+|                           | Grafana               | `latest`          | An open-source platform for visualizing data and creating powerful alerts.       |
 
 ## 🏗️ Architecture & Detailed Data Flow
 
