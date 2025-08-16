@@ -257,24 +257,15 @@ That's it! The entire pipeline is now running.
 
 ## 🕹️ Usage
 
-Once all services are up and running, you can access the different parts of the system through your web browser.
+Once all services are up and running, you can access the different parts of the system through your web browser using the following endpoints:
 
--   **Admin Panel**: `http://localhost:8000/admin`
-    -   This is the central hub for managing the entire pipeline. Here you can configure MQTT broker settings, add/remove/edit topic mappings, and manage validation schemas.
-
--   **Live Data Dashboard**: `http://localhost:8000/`
-    -   A real-time view of the validated and failed messages as they are processed by the system.
-
--   **Grafana Dashboard**: `http://localhost:3000`
-    -   The main visualization platform.
-    -   **Login**: Use `admin` for both username and password. You will be prompted to change the password on your first login.
-    -   The pre-configured dashboard will be available to view data from both InfluxDB and Prometheus, and to see active alerts.
-
--   **Prometheus UI**: `http://localhost:9090`
-    -   Allows you to explore the raw metrics collected from the FastAPI application. You can use it to test and debug PromQL queries.
-
--   **InfluxDB UI**: `http://localhost:8086`
-    -   Provides direct access to the time-series database. You can explore the raw data, run Flux queries, and manage your database buckets.
+| Service               | URL                           | Credentials / Notes                                                              |
+| :-------------------- | :---------------------------- | :------------------------------------------------------------------------------- |
+| **Admin Panel**       | `http://localhost:8000/admin` | Central hub for managing the pipeline's configuration.                           |
+| **Web Dashboard**     | `http://localhost:8000/`      | A real-time view of the validated and failed messages as they are processed.     |
+| **Grafana**           | `http://localhost:3000`       | Main visualization platform. **Login**: `admin` / `admin`.                       |
+| **Prometheus**        | `http://localhost:9090`       | Explore raw metrics collected from the application and test PromQL queries.      |
+| **InfluxDB**          | `http://localhost:8086`       | Direct access to the database to explore raw data with the Flux language.        |
 
 ## 📂 Project Structure
 
