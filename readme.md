@@ -257,17 +257,33 @@ That's it! The entire pipeline is now running.
 
 ## 🕹️ Usage
 
-Once all services are up and running, you can access the different parts of the system through your web browser using the following endpoints:
+Once all services are up and running, you can access the different parts of the system through your web browser. Each interface serves a unique purpose.
 
-| Service               | URL                           | Credentials / Notes                                                              |
-| :-------------------- | :---------------------------- | :------------------------------------------------------------------------------- |
-| **Admin Panel**       | `http://localhost:8000/admin` | Central hub for managing the pipeline's configuration.                           |
-| **Web Dashboard**     | `http://localhost:8000/`      | A real-time view of the validated and failed messages as they are processed.     |
-| **Grafana**           | `http://localhost:3000`       | Main visualization platform. **Login**: `admin` / `admin`.                       |
-| **Prometheus**        | `http://localhost:9090`       | Explore raw metrics collected from the application and test PromQL queries.      |
-| **InfluxDB**          | `http://localhost:8086`       | Direct access to the database to explore raw data with the Flux language.        |
+-   **Admin Panel**: `http://localhost:8000/admin`
+    -   **What it is**: The central control room for the entire data pipeline.
+    -   **Purpose**: This web interface allows you to dynamically configure every aspect of the system without any downtime. You can update MQTT broker settings (address, port), manage the list of subscribed source topics, define where `validated` and `failed` data should be republished, and, most importantly, create, view, and edit the Pandera validation schemas that form your data contracts.
 
-## 📂 Project Structure
+-   **Live Data Dashboard**: `http://localhost:8000/dashboard`
+    -   **What it is**: A real-time, lightweight message feed.
+    -   **Purpose**: This dashboard connects directly to the MQTT broker and subscribes to the `validated` and `failed` topics. It serves as an immediate visual confirmation that data is flowing through the system and allows you to see the processed data and detailed error reports the moment they are generated.
+
+-   **Grafana Dashboards**: `http://localhost:3000`
+    -   **What it is**: The main platform for advanced data visualization and alerting.
+    -   **Login**:
+        -   **Username**: `admin`
+        -   **Password**: `admin`
+    -   **Note**: You will be prompted to change the password on your first login for security.
+    -   **Purpose**: Grafana connects to both InfluxDB (for historical data) and Prometheus (for performance metrics) to provide rich, interactive dashboards. Here you can analyze long-term trends, monitor system health, and manage the alerting rules for critical events like high radiation levels or sensor inactivity.
+
+-   **Prometheus UI**: `http://localhost:9090`
+    -   **What it is**: The raw interface for the Prometheus monitoring system.
+    -   **Purpose**: This UI allows you to explore the raw metrics being collected from the FastAPI application. It's primarily a tool for developers to test and debug PromQL queries before building panels in Grafana and to verify that metrics are being scraped correctly.
+
+-   **InfluxDB UI**: `http://localhost:8086`
+    -   **What it is**: A direct data explorer and administration interface for the InfluxDB database.
+    -   **Purpose**: This powerful UI lets you interact directly with your time-series data. You can use the Data Explorer to build Flux queries visually or manually, inspect raw data points, manage database buckets and retention policies, and set up database tasks.
+
+## �� Project Structure
 
 The project repository is organized to clearly separate concerns, making it easier to navigate and maintain.
 
