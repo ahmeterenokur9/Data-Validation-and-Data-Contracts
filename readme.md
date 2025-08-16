@@ -5,6 +5,25 @@ A real-time, end-to-end solution for validating, processing, and visualizing IoT
 ![Grafana Dashboard](https://i.imgur.com/your-grafana-dashboard-image.png)
 _**(NOTE: Please replace this link with an actual screenshot of your main Grafana dashboard.)**_
 
+## 📖 Overview
+
+This project provides a complete ecosystem that captures raw MQTT messages, validates them against dynamic, user-defined schemas, and routes them for persistent storage and real-time visualization.
+
+The core of the system is a FastAPI application that acts as a central hub. It features a powerful web-based **Admin Panel** that allows users to dynamically configure MQTT broker settings, manage topic mappings, and—most importantly—create or edit the Pandera validation schemas on the fly.
+
+Validated and failed data points are intelligently separated. Time-series data is stored persistently in **InfluxDB**, while system performance metrics are exposed to **Prometheus**. Finally, **Grafana** serves as the unified visualization layer, offering comprehensive dashboards for live data monitoring, system health checks, and a powerful alerting system.
+
+## 📚 Table of Contents
+
+- [The Core Philosophy: Data Contracts with Pandera](#the-core-philosophy-data-contracts-with-pandera)
+- [Key Features](#-key-features)
+- [Tech Stack](#️-tech-stack)
+- [Architecture & Detailed Data Flow](#️-architecture--detailed-data-flow)
+- [Getting Started](#-getting-started)
+- [Usage](#️-usage)
+- [Project Structure](#-project-structure)
+- [Future Work & Known Limitations](#-future-work--known-limitations)
+
 ## The Core Philosophy: Data Contracts with Pandera
 
 In any data-driven system, especially in the world of IoT where data streams from countless diverse sources, the principle of "Garbage In, Garbage Out" holds true. Unreliable, malformed, or unexpected data can cause silent failures, corrupt databases, and lead to flawed analysis. This project's first and most critical objective is to act as a guardian of data quality.
@@ -79,25 +98,6 @@ When this validation fails, Pandera doesn't just return `False`. It raises a `Sc
 -   **Guaranteed Data Quality**: By validating at the entry point, every downstream component—from the InfluxDB database to the Grafana dashboards—is guaranteed to receive clean, predictable, and reliable data.
 
 By placing Pandera at the heart of our ingestion process, we transform the pipeline from a passive receiver of information into an active guardian of data quality.
-
-## 📖 Overview
-
-This project provides a complete ecosystem that captures raw MQTT messages, validates them against the dynamic, user-defined schemas described above, and routes them for persistent storage and real-time visualization.
-
-The core of the system is a FastAPI application that acts as a central hub. It features a powerful web-based **Admin Panel** that allows users to dynamically configure MQTT broker settings, manage topic mappings, and—most importantly—create or edit the Pandera validation schemas on the fly.
-
-Validated and failed data points are intelligently separated. Time-series data is stored persistently in **InfluxDB**, while system performance metrics are exposed to **Prometheus**. Finally, **Grafana** serves as the unified visualization layer, offering comprehensive dashboards for live data monitoring, system health checks, and a powerful alerting system.
-
-## 📚 Table of Contents
-
-- [The Core Philosophy: Data Contracts with Pandera](#the-core-philosophy-data-contracts-with-pandera)
-- [Key Features](#-key-features)
-- [Tech Stack](#️-tech-stack)
-- [Architecture & Detailed Data Flow](#️-architecture--detailed-data-flow)
-- [Getting Started](#-getting-started)
-- [Usage](#️-usage)
-- [Project Structure](#-project-structure)
-- [Future Work & Known Limitations](#-future-work--known-limitations)
 
 ## ✨ Key Features
 
