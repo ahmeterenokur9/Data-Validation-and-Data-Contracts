@@ -212,25 +212,23 @@ Make sure you have the following software installed on your system:
 
 -   **Docker**: [Download & Install Docker](https://www.docker.com/products/docker-desktop/)
 -   **Docker Compose**: Docker Desktop for Windows and Mac includes Docker Compose. For Linux, follow the [official installation guide](https://docs.docker.com/compose/install/).
--   **Git**: [Download & Install Git](https://git-scm.com/downloads)
 
 ### Installation & Launch
 
-1.  **Clone the repository:**  
-    Open your terminal and clone the project repository to your local machine.
+1.  **Download the Project:**  
+    Download the project files as a ZIP archive. If you are on the GitHub page, click the green `<> Code` button, then select `Download ZIP`.
+
+2.  **Extract the Files:**  
+    Extract the contents of the downloaded ZIP file to a location of your choice on your computer. The extracted folder will be named something like `mqtt_validation_project-main`.
+
+3.  **Navigate to the Project Directory:**  
+    Open your terminal or command prompt and navigate into the extracted project folder.
 
     ```bash
-    git clone https://github.com/your-username/your-repo-name.git
-    ```
-    _**(NOTE: Please replace this URL with your actual repository URL.)**_
-
-2.  **Navigate to the project directory:**
-
-    ```bash
-    cd mqtt_validation_project
+    cd path/to/your/mqtt_validation_project-main
     ```
 
-3.  **Build and run the services:**  
+4.  **Build and run the services:**  
     Use Docker Compose to build the container images and start all the services in detached mode (`-d`).
 
     ```bash
@@ -239,11 +237,10 @@ Make sure you have the following software installed on your system:
 
     This command will:
     -   Pull the necessary base images (Python, InfluxDB, Prometheus, Grafana).
-    -   Build the custom Docker image for our FastAPI application.
-    -   Create and start containers for all services.
-    -   Connect them in a dedicated network.
+    -   Build the custom Docker image for our FastAPI application based on the local files.
+    -   Create and start containers for all services and connect them in a dedicated network.
 
-4.  **Verify the services are running:**  
+5.  **Verify the services are running:**  
     You can check the status of all running containers with:
 
     ```bash
