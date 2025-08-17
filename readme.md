@@ -398,17 +398,33 @@ This query counts the total increase in failed messages over the selected time r
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
 
--   **Prometheus UI**: `http://localhost:9090`
-    -   **What it is**: The raw interface for the Prometheus monitoring system.
-    -   **Login**: No authentication is configured by default.
-    -   **Purpose**: This UI allows you to explore the raw metrics being collected from the FastAPI application. It's primarily a tool for developers to test and debug PromQL queries before building panels in Grafana and to verify that metrics are being scraped correctly.
+### Prometheus UI: `http://localhost:9090`
 
--   **InfluxDB UI**: `http://localhost:8086`
-    -   **What it is**: A direct data explorer and administration interface for the InfluxDB database.
-    -   **Login**:
-        -   **Username**: `my-user`
-        -   **Password**: `my-password`
-    -   **Purpose**: This powerful UI lets you interact directly with your time-series data. You can use the Data Explorer to build Flux queries visually or manually, inspect raw data points, manage database buckets and retention policies, and set up database tasks.
+**What it is**: The raw, built-in user interface for the Prometheus monitoring system.
+
+**Login**: No authentication is configured by default.
+
+**Purpose**: While Grafana is our primary tool for *visualizing* metrics, the Prometheus UI is the best tool for *exploring and debugging* them. It serves two main purposes for a developer:
+
+1.  **Metric Exploration**: The "Expression" bar allows you to instantly see which metrics our FastAPI application is exposing and what their current values and labels are. For example, typing `mqtt_messages_processed_total` and clicking "Execute" will show you every single time-series for that metric, allowing you to confirm that labels like `sensor_id` and `error_type` are being reported correctly.
+
+2.  **PromQL Query Prototyping**: Before building a complex panel in Grafana, you can use this interface to build, test, and refine your PromQL queries. The "Graph" tab provides a simple, instant visualization, which is perfect for ensuring your query returns the data you expect before you spend time configuring a Grafana panel.
+
+### InfluxDB UI: `http://localhost:8086`
+
+**What it is**: A powerful web-based data management and administration interface for the InfluxDB database.
+
+**Login**:
+-   **Username**: `my-user`
+-   **Password**: `my-password`
+
+**Purpose**: This UI provides direct, low-level access to the time-series data stored by our pipeline. It's an essential tool for deep-dives, administration, and debugging data-related issues.
+
+**Key Features for Our Project:**
+
+-   **Data Explorer**: This is the most used feature. It allows you to build and execute **Flux** queries to inspect the raw data. You can switch between a Script Editor for writing queries manually and a visual Query Builder. This is the ultimate source of truth to confirm that data is being written correctly to the database with the right tags and fields.
+-   **Buckets Management**: You can view the `mqtt_data` bucket, see its current retention policies (how long data is stored), and manage other database settings.
+-   **Load Data**: While our project writes data via the API, this section allows you to manually upload or paste sample data, which can be useful for testing specific scenarios.
 
 ## 📂 Project Structure
 
