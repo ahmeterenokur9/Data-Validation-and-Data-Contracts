@@ -259,9 +259,58 @@ That's it! The entire pipeline is now running.
 
 Once all services are up and running, you can access the different parts of the system through your web browser. Each interface serves a unique purpose.
 
--   **Admin Panel**: `http://localhost:8000/admin`
-    -   **What it is**: The central control room for the entire data pipeline.
-    -   **Purpose**: This web interface allows you to dynamically configure every aspect of the system without any downtime. You can update MQTT broker settings (address, port), manage the list of subscribed source topics, define where `validated` and `failed` data should be republished, and, most importantly, create, view, and edit the Pandera validation schemas that form your data contracts.
+### Admin Panel: `http://localhost:8000/admin`
+
+**What it is**: The central control room for the entire data pipeline.
+
+**Purpose**: This web interface gives you complete, real-time control over the data pipeline's configuration. All changes made here are applied instantly without needing to restart any services, allowing for true dynamic behavior.
+
+The panel is divided into three main sections:
+
+#### 1. MQTT Broker Settings
+This section at the top allows you to configure the connection to your MQTT broker.
+-   **Broker**: The address of the MQTT broker (e.g., `broker.hivemq.com`).
+-   **Port**: The connection port (usually `1883` for unencrypted connections).
+-   **Saving**: After making changes, click the **"Save MQTT Settings"** button. The button will visually indicate when there are unsaved changes, ensuring you don't forget to apply them.
+
+#### 2. Topic Mappings Management
+This is where you define the core routing and validation logic of the pipeline. Each "mapping" is a card that represents a contract for a specific data source.
+-   **Source Topic**: The raw topic the system subscribes to (e.g., `/sensor1`). This is the entry point for data.
+-   **Validated Topic**: The topic where clean, successfully validated data will be republished.
+-   **Failed Topic**: The topic where a detailed error report will be published if the data fails validation.
+-   **Schema File**: A dropdown menu to select the validation contract (a `.json` file from the `schemas/` directory) that should be applied to the data from the `Source Topic`.
+
+**Actions:**
+-   **Add a New Mapping**: Click the **"Add New Mapping"** button, fill in the details for a new sensor or data source, and click the save icon.
+-   **Edit an Existing Mapping**: Simply click on any field in a card, modify its value, and the card will be marked for saving.
+-   **Delete a Mapping**: Click the trash can icon on a card to remove it.
+-   **Saving Changes**: After adding, editing, or deleting mappings, click the main **"Save Topic Mappings"** button at the bottom of the section to apply all changes.
+
+#### 3. Schema Management
+This powerful section on the right allows you to manage the data contracts (Pandera schemas) themselves directly from the UI.
+
+-   **File List**: Shows all available `.json` schema files in the `schemas/` directory. Clicking a file name loads its content into the editor below.
+-   **Create New Schema**: The **"Create New Schema"** button allows you to start a new, empty schema file.
+
+**The Schema Editor:**
+The editor has two modes, allowing both technical and non-technical users to manage schemas effectively:
+
+-   **Visual Editor (Default)**: A user-friendly, form-based interface for building a schema without writing any code.
+    -   You can define general schema settings like `strict` mode (to reject extra fields).
+    -   Add `Columns` by name, specify their `Data Type` (e.g., `str`, `int`, `float`, `datetime`), and set properties like `Nullable` or `Unique`.
+    -   For each column, you can add multiple `Checks` to enforce specific rules (e.g., `in_range`, `greater_than`, `str_matches` for regex).
+-   **Raw Text (JSON) Editor**: For advanced users, this mode allows you to view, edit, or paste the schema definition as a raw, strict JSON object. The system automatically syncs the content between the Visual and Raw editors.
+
+**How it Works (The Magic of Dynamic Configuration):**
+When you save any change in the Admin Panel (be it MQTT settings, mappings, or a schema), the following happens in sequence:
+1.  The frontend sends the updated configuration to the backend API.
+2.  The backend (`main.py`) persists the changes to the appropriate file (`config.json` or a file in `schemas/`).
+3.  **Crucially, it gracefully restarts the internal MQTT client (`mqtt_manager.py`) in a background thread.**
+4.  The new MQTT client initializes by reading the updated configuration files, instantly applying the new settings (e.g., subscribing to new topics or using a modified schema).
+5.  The backend also sends a WebSocket notification to the Live Data Dashboard, ensuring it re-syncs and subscribes to the correct topics.
+
+This entire process happens in seconds, providing a seamless and truly dynamic control over your data pipeline.
+
 
 -   **Live Data Dashboard**: `http://localhost:8000/dashboard`
     -   **What it is**: A real-time, lightweight message feed.
@@ -277,13 +326,17 @@ Once all services are up and running, you can access the different parts of the 
 
 -   **Prometheus UI**: `http://localhost:9090`
     -   **What it is**: The raw interface for the Prometheus monitoring system.
+    -   **Login**: No authentication is configured by default.
     -   **Purpose**: This UI allows you to explore the raw metrics being collected from the FastAPI application. It's primarily a tool for developers to test and debug PromQL queries before building panels in Grafana and to verify that metrics are being scraped correctly.
 
 -   **InfluxDB UI**: `http://localhost:8086`
     -   **What it is**: A direct data explorer and administration interface for the InfluxDB database.
+    -   **Login**:
+        -   **Username**: `my-user`
+        -   **Password**: `my-password`
     -   **Purpose**: This powerful UI lets you interact directly with your time-series data. You can use the Data Explorer to build Flux queries visually or manually, inspect raw data points, manage database buckets and retention policies, and set up database tasks.
 
-## �� Project Structure
+## 📂 Project Structure
 
 The project repository is organized to clearly separate concerns, making it easier to navigate and maintain.
 
