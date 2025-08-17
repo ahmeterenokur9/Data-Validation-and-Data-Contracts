@@ -398,26 +398,43 @@ This query counts the total increase in failed messages over the selected time r
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
 
-#### The Alerting System
-Beyond visualization, Grafana serves as our central alerting hub. It continuously evaluates the data from both InfluxDB and Prometheus against predefined rules and can notify users when anomalies occur. This turns our passive monitoring system into a proactive one.
+#### The Alerting System: Your Proactive Watchdog
 
-Our pre-configured dashboard includes two key examples of Grafana's alerting capabilities:
+A key feature of this project is its powerful, pre-configured alerting system built within Grafana. Instead of passively watching dashboards, the system can proactively notify you when predefined conditions are met. This section explains how it works, using our critical **High Radiation Alert** as a case study.
 
-**1. Data-Driven Alerting (from InfluxDB)**
--   **Rule**: `High Radiation Level Detected!`
--   **Purpose**: To alert when the *content* of the data itself is critical.
--   **Mechanism**: This rule is attached to the "Live Radiation Level" panel. It runs a Flux query against InfluxDB every 10 seconds.
--   **Condition**: It triggers and enters a `Firing` state if the latest `radiation_level` value from `sensor4` is **above 1.0**.
--   **Impact**: This demonstrates how to monitor for critical threshold breaches in your actual sensor data.
+**How to Recreate or Understand an Alert (Case Study: High Radiation)**
 
-**2. Metric-Driven Alerting (from Prometheus)**
--   **Rule**: `Sensor 1 Inactivity` (Example)
--   **Purpose**: To alert when a system stops behaving as expected, in this case, when a sensor stops sending data. This monitors the *health* of the pipeline itself.
--   **Mechanism**: This rule uses a PromQL query to check the activity of `sensor1`.
--   **Condition**: It triggers if the **increase** in the number of messages from `sensor1` over the last 5 minutes is **less than 1**. This effectively means the sensor has gone silent.
--   **Impact**: This demonstrates how to monitor for "heartbeat" issues and ensure your data sources are online and operational.
+This is a guide for understanding the logic behind our alerts. You can follow these steps in the Grafana UI by editing the "Live Radiation Level" panel and navigating to the "Alert" tab.
 
-When an alert is `Firing`, you will see visual cues across the dashboard, such as a red, pulsating heartbeat icon and annotations on the graphs, indicating the exact moment the alert was triggered.
+1.  **The Goal**: The objective is to trigger an alert instantly if the `radiation_level` from `sensor4` exceeds a critical safety threshold of `1.0 µSv/h`.
+
+2.  **The Data Source & Query (InfluxDB)**: First, we need to isolate the exact data point to monitor. The alert rule is attached to a panel that uses the following Flux query to get the latest radiation level from InfluxDB:
+    ```flux
+    from(bucket: "mqtt_data")
+      |> range(start: -1m) // Look at recent data
+      |> filter(fn: (r) =>
+        r._measurement == "mqtt_messages" and
+        r.status == "validated" and
+        r.topic == "/sensor4" and
+        r._field == "radiation_level"
+      )
+      |> last() // We only care about the most recent value
+    ```
+
+3.  **The Condition (The Trigger Rule)**: The core of the alert is a simple but powerful condition:
+    -   `WHEN` **`last()`** `OF` **`query_result`** `IS ABOVE` **`1.0`**
+    -   This tells Grafana: "Look at the single, most recent value returned by our query. If that value is greater than 1.0, the condition is met."
+
+4.  **The Evaluation Behavior (The Speed)**: This defines how quickly the system reacts.
+    -   **Evaluation Interval**: The rule is evaluated every **`10 seconds`**. This means Grafana checks the radiation level against the threshold six times per minute, providing rapid detection.
+    -   **Pending Period (`For`)**: This is set to **`0s`**. This is critical. It means the moment the condition is met, the alert immediately enters the `Firing` state without any delay. For less critical alerts, you might set this to `1m` to avoid alerts from brief, transient spikes.
+
+**What Happens When an Alert Fires?**
+-   The border of the panel on the dashboard will turn red and show a pulsing heartbeat icon.
+-   A red vertical line (an "annotation") will appear on all graphs at the timestamp the alert was triggered.
+-   In a production environment, this could also trigger notifications to email, Slack, or other services.
+
+This same logic is applied to other pre-configured alerts, such as the **High Humidity Alert** (using InfluxDB) and the **Sensor Inactivity Alert** (which uses Prometheus and the `rate()` function to check if a sensor has stopped sending data).
 
 ### Prometheus UI: `http://localhost:9090`
 
