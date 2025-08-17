@@ -311,6 +311,7 @@ When you save any change in the Admin Panel (be it MQTT settings, mappings, or a
 
 This entire process happens in seconds, providing a seamless and truly dynamic control over your data pipeline.
 
+---
 
 ### Live Data Dashboard: `http://localhost:8000/dashboard`
 
@@ -334,6 +335,8 @@ This direct connection to the message bus makes it incredibly fast and efficient
     -   **Filter by Source Topic**: The list of source topics is dynamically generated based on the configuration in the Admin Panel. You can select one or more topics to isolate data from specific sensors.
     -   **Filter by Error Type**: For failed messages, you can drill down into specific error categories (e.g., `wrong_type`, `out_of_range`, `bad_format`) to diagnose recurring data quality issues.
 -   **Automatic Re-synchronization**: The dashboard maintains a WebSocket connection to the backend server. If you make a change in the Admin Panel (e.g., add a new sensor topic), the backend sends a `"config_updated"` notification. The dashboard automatically receives this, re-fetches the configuration, and subscribes to the new topics without requiring a page refresh. This ensures it is always in sync with the pipeline's current state.
+
+---
 
 ### Grafana Dashboards: `http://localhost:3000`
 
@@ -398,9 +401,9 @@ This query counts the total increase in failed messages over the selected time r
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
 
-#### The Alerting System: Your Proactive Watchdog
+#### The Alerting System
 
-A key feature of this project is its powerful, pre-configured alerting system built within Grafana. Instead of passively watching dashboards, the system can proactively notify you when predefined conditions are met. This section explains how it works, using our critical **High Radiation Alert** as a case study.
+Beyond simple visualization, one of Grafana's most powerful capabilities is its integrated alerting engine. Instead of requiring a user to passively watch dashboards, the system can be configured to proactively issue alerts when data breaches predefined thresholds. This section explains how this system works, using our critical **High Radiation Alert** as a case study.
 
 **How to Recreate or Understand an Alert (Case Study: High Radiation)**
 
@@ -436,6 +439,8 @@ This is a guide for understanding the logic behind our alerts. You can follow th
 
 This same logic is applied to other pre-configured alerts, such as the **High Humidity Alert** (using InfluxDB) and the **Sensor Inactivity Alert** (which uses Prometheus and the `rate()` function to check if a sensor has stopped sending data).
 
+---
+
 ### Prometheus UI: `http://localhost:9090`
 
 **What it is**: The raw, built-in user interface for the Prometheus monitoring system.
@@ -447,6 +452,8 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 1.  **Metric Exploration**: The "Expression" bar allows you to instantly see which metrics our FastAPI application is exposing and what their current values and labels are. For example, typing `mqtt_messages_processed_total` and clicking "Execute" will show you every single time-series for that metric, allowing you to confirm that labels like `sensor_id` and `error_type` are being reported correctly.
 
 2.  **PromQL Query Prototyping**: Before building a complex panel in Grafana, you can use this interface to build, test, and refine your PromQL queries. The "Graph" tab provides a simple, instant visualization, which is perfect for ensuring your query returns the data you expect before you spend time configuring a Grafana panel.
+
+---
 
 ### InfluxDB UI: `http://localhost:8086`
 
