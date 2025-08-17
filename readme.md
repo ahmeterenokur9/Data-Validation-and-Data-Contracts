@@ -312,17 +312,91 @@ When you save any change in the Admin Panel (be it MQTT settings, mappings, or a
 This entire process happens in seconds, providing a seamless and truly dynamic control over your data pipeline.
 
 
--   **Live Data Dashboard**: `http://localhost:8000/dashboard`
-    -   **What it is**: A real-time, lightweight message feed.
-    -   **Purpose**: This dashboard connects directly to the MQTT broker and subscribes to the `validated` and `failed` topics. It serves as an immediate visual confirmation that data is flowing through the system and allows you to see the processed data and detailed error reports the moment they are generated.
+### Live Data Dashboard: `http://localhost:8000/dashboard`
 
--   **Grafana Dashboards**: `http://localhost:3000`
-    -   **What it is**: The main platform for advanced data visualization and alerting.
-    -   **Login**:
-        -   **Username**: `admin`
-        -   **Password**: `admin`
-    -   **Note**: You will be prompted to change the password on your first login for security.
-    -   **Purpose**: Grafana connects to both InfluxDB (for historical data) and Prometheus (for performance metrics) to provide rich, interactive dashboards. Here you can analyze long-term trends, monitor system health, and manage the alerting rules for critical events like high radiation levels or sensor inactivity.
+**What it is**: A real-time, lightweight message feed designed for immediate operational awareness.
+
+**Purpose**: While Grafana is used for deep analysis and historical trends, the Live Data Dashboard serves a different, more immediate purpose: to provide a live, unfiltered view of the data pipeline's pulse. It answers the question, "What is happening in the system *right now*?"
+
+**How It Works:**
+The dashboard's JavaScript (`app.js`) connects directly to the MQTT broker using the MQTT.js library. It doesn't interact with any databases. When the page loads, it first fetches the current topic mappings from the backend API. It then subscribes to all the `validated` and `failed` topics defined in the Admin Panel.
+
+This direct connection to the message bus makes it incredibly fast and efficient.
+
+**Key Features:**
+
+-   **Live Message Cards**: Every message republished by the `mqtt_manager` appears instantly as a card in the main feed.
+    -   **Green `VALIDATED` Cards**: Show clean data that has successfully passed schema validation.
+    -   **Red `FAILED` Cards**: Display the detailed error report for messages that failed validation. This is invaluable for real-time debugging, as you can see exactly which field failed, why, and what the original problematic data was.
+-   **Real-time Statistics**: The top-left corner shows a running count of total messages received, as well as a breakdown of validated vs. failed messages for the current session.
+-   **Dynamic Filtering**: The sidebar allows you to filter the live feed to quickly find what you're looking for.
+    -   **Filter by Status**: Show only `Validated` messages, only `Failed` messages, or both.
+    -   **Filter by Source Topic**: The list of source topics is dynamically generated based on the configuration in the Admin Panel. You can select one or more topics to isolate data from specific sensors.
+    -   **Filter by Error Type**: For failed messages, you can drill down into specific error categories (e.g., `wrong_type`, `out_of_range`, `bad_format`) to diagnose recurring data quality issues.
+-   **Automatic Re-synchronization**: The dashboard maintains a WebSocket connection to the backend server. If you make a change in the Admin Panel (e.g., add a new sensor topic), the backend sends a `"config_updated"` notification. The dashboard automatically receives this, re-fetches the configuration, and subscribes to the new topics without requiring a page refresh. This ensures it is always in sync with the pipeline's current state.
+
+### Grafana Dashboards: `http://localhost:3000`
+
+**What it is**: The main platform for advanced data visualization, long-term analysis, and alerting.
+
+**Login**:
+-   **Username**: `admin`
+-   **Password**: `admin`
+-   *(You will be prompted to change this on first login.)*
+
+**Purpose**: Grafana is the most powerful component of our visualization stack. It unifies data from multiple sources into a single, cohesive dashboard, allowing you to correlate system performance with the actual data being processed. In our project, Grafana is configured with two distinct data sources, each serving a specific purpose.
+
+#### The Two Pillars: InfluxDB and Prometheus Integration
+
+Understanding why we use two data sources is key to understanding the system's observability strategy.
+
+1.  **InfluxDB - The "What"**:
+    -   **Data Type**: Stores the rich, raw, historical data (the *content* of the messages). Every temperature reading, humidity value, and detailed error report is stored here.
+    -   **Query Language**: Flux.
+    -   **Use Case**: Used for deep analysis of the data itself. Answers questions like, *"What was the trend of `radiation_level` for `sensor4` over the last 24 hours?"* or *"Show me all `failed` messages for `sensor1` where the `error_type` was `out_of_range`."*
+
+2.  **Prometheus - The "How Well"**:
+    -   **Data Type**: Stores time-series metrics about the *performance* and *health* of the application. It doesn't know what the humidity value was, but it knows *how many* messages were processed.
+    -   **Query Language**: PromQL.
+    -   **Use Case**: Used for monitoring the health and throughput of the pipeline. Answers questions like, *"What is the rate of incoming messages per second from `sensor1`?"* or *"What is the ratio of `validated` to `failed` messages over the last hour?"*
+
+By combining these two, we can answer complex questions, such as "Did the rate of `out_of_range` errors increase after the per-second message rate spiked?"
+
+#### Example Queries Used in Our Dashboards
+
+Here are some examples of the queries that power our pre-configured Grafana dashboard, showcasing how we use both data sources.
+
+**1. Visualizing a Specific Data Field (InfluxDB - Flux)**
+This query retrieves the historical `humidity` values for `sensor1`, allowing us to plot its trend over time.
+
+```flux
+// InfluxDB Flux Query
+from(bucket: "mqtt_data")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) =>
+    r._measurement == "mqtt_messages" and
+    r.status == "validated" and
+    r.topic == "/sensor1" and
+    r._field == "humidity"
+  )
+  |> yield(name: "humidity")
+```
+
+**2. Calculating the Live Message Rate (Prometheus - PromQL)**
+This query calculates the per-second average rate of `validated` messages from `sensor1` over the last minute. This is perfect for a "Stat" or "Gauge" panel to show live throughput.
+
+```promql
+// Prometheus PromQL Query
+rate(mqtt_messages_processed_total{sensor_id="sensor1", status="validated"}[1m])
+```
+
+**3. Counting Total Failures by Error Type (Prometheus - PromQL)**
+This query counts the total increase in failed messages over the selected time range and groups them by the `error_type`. This is ideal for a pie chart or bar chart to quickly identify the most common data quality issues.
+
+```promql
+// Prometheus PromQL Query
+sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
+```
 
 -   **Prometheus UI**: `http://localhost:9090`
     -   **What it is**: The raw interface for the Prometheus monitoring system.
