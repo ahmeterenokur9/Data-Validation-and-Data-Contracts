@@ -398,6 +398,27 @@ This query counts the total increase in failed messages over the selected time r
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
 
+#### The Alerting System
+Beyond visualization, Grafana serves as our central alerting hub. It continuously evaluates the data from both InfluxDB and Prometheus against predefined rules and can notify users when anomalies occur. This turns our passive monitoring system into a proactive one.
+
+Our pre-configured dashboard includes two key examples of Grafana's alerting capabilities:
+
+**1. Data-Driven Alerting (from InfluxDB)**
+-   **Rule**: `High Radiation Level Detected!`
+-   **Purpose**: To alert when the *content* of the data itself is critical.
+-   **Mechanism**: This rule is attached to the "Live Radiation Level" panel. It runs a Flux query against InfluxDB every 10 seconds.
+-   **Condition**: It triggers and enters a `Firing` state if the latest `radiation_level` value from `sensor4` is **above 1.0**.
+-   **Impact**: This demonstrates how to monitor for critical threshold breaches in your actual sensor data.
+
+**2. Metric-Driven Alerting (from Prometheus)**
+-   **Rule**: `Sensor 1 Inactivity` (Example)
+-   **Purpose**: To alert when a system stops behaving as expected, in this case, when a sensor stops sending data. This monitors the *health* of the pipeline itself.
+-   **Mechanism**: This rule uses a PromQL query to check the activity of `sensor1`.
+-   **Condition**: It triggers if the **increase** in the number of messages from `sensor1` over the last 5 minutes is **less than 1**. This effectively means the sensor has gone silent.
+-   **Impact**: This demonstrates how to monitor for "heartbeat" issues and ensure your data sources are online and operational.
+
+When an alert is `Firing`, you will see visual cues across the dashboard, such as a red, pulsating heartbeat icon and annotations on the graphs, indicating the exact moment the alert was triggered.
+
 ### Prometheus UI: `http://localhost:9090`
 
 **What it is**: The raw, built-in user interface for the Prometheus monitoring system.
