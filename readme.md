@@ -403,7 +403,6 @@ Here are some examples of the queries that power our pre-configured Grafana dash
 This query retrieves the historical `humidity` values for `sensor1`, allowing us to plot its trend over time.
 
 ```bash
-// InfluxDB Flux Query
 from(bucket: "mqtt_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
   |> filter(fn: (r) =>
@@ -419,7 +418,6 @@ from(bucket: "mqtt_data")
 This query calculates the per-second average rate of `validated` messages from `sensor1` over the last minute. This is perfect for a "Stat" or "Gauge" panel to show live throughput.
 
 ```promql
-// Prometheus PromQL Query
 rate(mqtt_messages_processed_total{sensor_id="sensor1", status="validated"}[1m])
 ```
 
@@ -427,7 +425,6 @@ rate(mqtt_messages_processed_total{sensor_id="sensor1", status="validated"}[1m])
 This query counts the total increase in failed messages over the selected time range and groups them by the `error_type`. This is ideal for a pie chart or bar chart to quickly identify the most common data quality issues.
 
 ```promql
-// Prometheus PromQL Query
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
 
@@ -442,7 +439,7 @@ This is a guide for understanding the logic behind our alerts. You can follow th
 1.  **The Goal**: The objective is to trigger an alert instantly if the `radiation_level` from `sensor4` exceeds a critical safety threshold of `1.0 µSv/h`.
 
 2.  **The Data Source & Query (InfluxDB)**: First, we need to isolate the exact data point to monitor. The alert rule is attached to a panel that uses the following Flux query to get the latest radiation level from InfluxDB:
-    ```flux
+    ```bash
     from(bucket: "mqtt_data")
       |> range(start: -1m) // Look at recent data
       |> filter(fn: (r) =>
