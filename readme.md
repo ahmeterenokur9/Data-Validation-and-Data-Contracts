@@ -417,14 +417,14 @@ from(bucket: "mqtt_data")
 **2. Calculating the Live Message Rate (Prometheus - PromQL)**
 This query calculates the per-second average rate of `validated` messages from `sensor1` over the last minute. This is perfect for a "Stat" or "Gauge" panel to show live throughput.
 
-```promql
+```bash
 rate(mqtt_messages_processed_total{sensor_id="sensor1", status="validated"}[1m])
 ```
 
 **3. Counting Total Failures by Error Type (Prometheus - PromQL)**
 This query counts the total increase in failed messages over the selected time range and groups them by the `error_type`. This is ideal for a pie chart or bar chart to quickly identify the most common data quality issues.
 
-```promql
+```bash
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
 
