@@ -202,6 +202,36 @@ The system's true power lies in its ability to be reconfigured on the fly via th
     -   **InfluxDB**: For querying the rich, historical, raw data content using the Flux language (e.g., `SELECT humidity WHERE topic='/sensor1'`). This is for analyzing the *content* of the data.
 -   The **Alerting Engine** in Grafana continuously evaluates rules against both data sources, providing comprehensive monitoring of both system health and data quality.
 
+### Data Access and Integration Model
+
+The InfluxDB, Prometheus, and Grafana services do not directly subscribe to MQTT topics. Instead, the **FastAPI application (`fastapi_app`) acts as the central bridge and translator** for all of them. It is the only component that processes the raw MQTT messages, subsequently preparing and serving the data in formats that each specialized tool can understand.
+
+#### InfluxDB Integration (The "Push" Model)
+
+InfluxDB stores the rich, detailed content of every message. Our application actively **pushes** data to it.
+
+1.  **The Component**: Inside `mqtt_manager.py`, we have an `InfluxDBWriter` class.
+2.  **The Trigger**: After a message is validated (either successfully or as a failure), the `mqtt_manager` calls the appropriate method on the writer (e.g., `write_validated_data`).
+3.  **The Action**: The writer constructs a data `Point` using the `influxdb-client` library. This `Point` is structured with a measurement (`mqtt_messages`), tags for easy filtering (like `status`, `topic`, `sensor_id`), and fields containing the actual data (like `temperature`, `humidity`, or the full JSON error report).
+4.  **The Result**: This data point is sent over HTTP to the InfluxDB container. InfluxDB receives it and stores it, making the full historical record of every message available for querying.
+
+#### Prometheus Integration (The "Pull" Model)
+
+Prometheus stores high-level performance metrics. It operates on a **pull** model, meaning it periodically scrapes (requests) data from our application.
+
+1.  **The Component**: We use the `prometheus-client` library within `mqtt_manager.py` to define a `Counter` metric named `mqtt_messages_processed_total`.
+2.  **The Trigger**: Every time a message is processed (validated or failed), our code simply increments this in-memory counter with the appropriate labels (`status`, `sensor_id`, `error_type`).
+3.  **The Exposure**: The FastAPI application automatically exposes a special endpoint: `http://localhost:8000/metrics`. This page serves the current value of all our counters in a simple text format that Prometheus is designed to understand.
+4.  **The Action**: The `prometheus.yml` configuration file tells the Prometheus container to "scrape" this `/metrics` endpoint every 15 seconds. Prometheus visits the URL, reads the values, and stores them in its own time-series database.
+5.  **The Result**: Prometheus builds a highly efficient database of our system's performance over time, without ever needing to know the content of the actual MQTT messages.
+
+#### Grafana's Role (The Unifier)
+
+Grafana is the final piece that brings everything together. It does not talk to our FastAPI application at all. Instead:
+-   It is configured with **two Data Sources**: one pointing to the Prometheus container (`http://prometheus:9090`) and another pointing to the InfluxDB container (`http://influxdb:8086`).
+-   When you view a dashboard, Grafana sends queries to these data sources—PromQL queries to Prometheus for performance metrics and Flux queries to InfluxDB for historical data content—and masterfully combines the results into the unified dashboards you see.
+
+
 ## 🚀 Getting Started
 
 Follow these instructions to get the entire project stack up and running on your local machine for development and testing purposes.
