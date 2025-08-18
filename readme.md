@@ -503,33 +503,35 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 
 ## 📂 Project Structure
 
-The project repository is organized to clearly separate concerns, making it easier to navigate and maintain.
+The project repository is organized to clearly separate concerns. Here are the most important files and directories:
 
     .
     ├── schemas/              # Contains all Pandera validation schemas in JSON format.
-    ├── sensors/              # Includes Python scripts that simulate sensor data publication.
-    │   ├── gui_publisher.py  # A user-friendly GUI for manual message publishing and testing.
-    │   └── ...
-    ├── static/               # Frontend assets for the Admin Panel and Live Dashboard.
-    │   ├── admin.html
-    │   ├── dashboard.html
-    │   └── ...
-    ├── templates/            # HTML templates rendered by FastAPI.
+    ├── sensors/              # Includes various Python scripts that simulate sensor data publication for testing.
+    ├── static/               # Frontend assets (HTML, CSS, JS) for the Admin Panel and Live Dashboard.
     ├── config.json           # The heart of the system's configuration: MQTT settings and topic mappings.
     ├── docker-compose.yml    # Orchestrates the deployment of all services (app, databases, monitoring).
     ├── Dockerfile            # Defines the build process for the FastAPI application container.
-    ├── main.py               # The main FastAPI application file: handles APIs, WebSockets, and lifespan events.
-    ├── mqtt_manager.py       # Core logic for the MQTT client: handles connections, message validation, and republishing.
+    ├── main.py               # The main FastAPI application file: handles APIs, WebSockets, and overall application state.
+    ├── mqtt_manager.py       # Core logic for the MQTT client: handles connections, message validation, and data routing.
     ├── prometheus.yml        # Configuration file for Prometheus, defining scrape targets.
     ├── requirements.txt      # Lists the Python dependencies for the application.
     └── utils.py              # Utility functions, such as the Pandera error parser.
 
 ## 🎯 Future Work & Known Limitations
 
-This project provides a robust foundation, but there are several areas for potential improvement and expansion:
+This project provides a robust foundation for a real-time data validation pipeline. The following areas represent opportunities for future development and enhancement:
 
--   **Enhanced Security**: Implement authentication and authorization for the Admin Panel and API endpoints to secure the configuration.
--   **Schema Versioning**: Introduce a system to version control schemas, allowing for smoother transitions when sensor data formats change.
--   **More Comprehensive Testing**: Add a suite of unit and integration tests to improve code reliability and catch regressions.
--   **CI/CD Pipeline**: Implement a Continuous Integration/Continuous Deployment pipeline to automate testing and deployment processes.
--   **Data Backfilling**: Develop a mechanism for reprocessing historical data if a validation schema is updated. 
+-   **Enhanced Security Layer**: The current implementation lacks authentication and authorization for the Admin Panel and its corresponding APIs. A crucial next step for any production-like environment would be to implement a robust security layer (e.g., using OAuth2 or API keys) to protect sensitive system configurations.
+
+-   **Configurable Alert Notifications**: Grafana's alerting engine is capable of sending notifications to various channels (Email, Slack, PagerDuty, etc.). A key improvement would be to fully configure and document these notification channels, transforming alerts from simple dashboard indicators into actionable, real-time notifications.
+
+-   **Integrated MQTT Broker**: The system currently relies on a public, external MQTT broker. For a more self-contained, secure, and reliable deployment, an integrated broker service (e.g., Mosquitto) could be added to the `docker-compose.yml` stack.
+
+-   **Support for Advanced Pandera Features**: The validation logic is currently built around dynamically loading `DataFrameSchema` definitions. The system could be extended to support other powerful Pandera features, such as integrating with its function decorators (`@pa.check_input`) for schema enforcement directly within application code, offering an alternative, code-centric validation approach.
+
+-   **Integration with Real-World Data Streams**: While the provided simulators are effective for testing, a future milestone would involve integrating and testing the pipeline with data from actual physical sensors to validate its performance and resilience under real-world conditions.
+
+-   **AI-Powered Schema and Anomaly Detection**: A forward-looking enhancement could involve integrating machine learning models to analyze incoming data streams. This could enable advanced features such as:
+    -   **Automatic Schema Inference**: Generating a baseline Pandera schema by analyzing a sample of the data.
+    -   **Dynamic Anomaly Detection**: Automatically adjusting alarm thresholds in Grafana based on learned normal operating behaviors, moving from static thresholds to dynamic anomaly detection. 
