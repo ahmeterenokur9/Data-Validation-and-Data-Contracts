@@ -518,8 +518,7 @@ The project repository is organized to clearly separate concerns. Here are the m
 ├── prometheus.yml        # Configuration file for Prometheus, defining scrape targets.
 ├── requirements.txt      # Lists the Python dependencies for the application.
 └── utils.py              # Utility functions, such as the Pandera error parser.
-```yaml
-
+```
 
 ## 🎯 Future Work & Known Limitations
 
