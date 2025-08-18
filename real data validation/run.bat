@@ -1,9 +1,0 @@
-@echo off
-echo [SUBSCRIBER] Starting subscriber...
-start cmd /k "python subscriber.py"
-
-echo [WAIT] Waiting 5 seconds before starting publisher...
-timeout /t 5 /nobreak >nul
-
-echo [PUBLISHER] Starting publisher...
-start cmd /k "python publisher.py"
