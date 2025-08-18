@@ -402,15 +402,20 @@ Here are some examples of the queries that power our pre-configured Grafana dash
 **1. Visualizing a Specific Data Field (InfluxDB - Flux)**
 This query retrieves the historical `humidity` values for `sensor1`, allowing us to plot its trend over time.
 
+## InfluxDB Flux Query
+
+```flux
+// InfluxDB Flux Query
 from(bucket: "mqtt_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
   |> filter(fn: (r) =>
-    r._measurement = "mqtt_messages" AND
-    r.status = "validated" AND
-    r.topic = "/sensor1" AND
-    r._field = "humidity"
+    r._measurement == "mqtt_messages" and
+    r.status == "validated" and
+    r.topic == "/sensor1" and
+    r._field == "humidity"
   )
   |> yield(name: "humidity")
+
 
 
 **2. Calculating the Live Message Rate (Prometheus - PromQL)**
