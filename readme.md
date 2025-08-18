@@ -528,7 +528,9 @@ This project provides a robust foundation for a real-time data validation pipeli
 
 -   **Integrated MQTT Broker**: The system currently relies on a public, external MQTT broker. For a more self-contained, secure, and reliable deployment, an integrated broker service (e.g., Mosquitto) could be added to the `docker-compose.yml` stack.
 
--   **Support for Advanced Pandera Features**: The validation logic is currently built around dynamically loading `DataFrameSchema` definitions. The system could be extended to support other powerful Pandera features, such as integrating with its function decorators (`@pa.check_input`) for schema enforcement directly within application code, offering an alternative, code-centric validation approach.
+-   **Support for Advanced Pandera Features**: The validation logic is currently built around dynamically loading `DataFrameSchema` definitions. The system could be extended to support other powerful Pandera features, offering alternative, code-centric validation approaches. This could include:
+    -   **Integration with `DataFrameModel`**: Allowing developers to define schemas as Python classes that inherit from `pa.DataFrameModel`. This provides the benefits of static type checking and IDE auto-completion for schema definitions.
+    -   **Decorator-Based Validation**: Integrating with Pandera's function decorators (`@pa.check_input`, `@pa.check_output`) for schema enforcement directly at the function level within the application code.
 
 -   **Integration with Real-World Data Streams**: While the provided simulators are effective for testing, a future milestone would involve integrating and testing the pipeline with data from actual physical sensors to validate its performance and resilience under real-world conditions.
 
