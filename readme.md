@@ -1,9 +1,6 @@
-# MQTT Data Validation & Monitoring Pipeline
+# Data Validation & Monitoring Pipeline
 
 A real-time, end-to-end solution for validating, processing, and visualizing IoT data streams. This project leverages a modern tech stack including MQTT, FastAPI, Pandera, InfluxDB, Prometheus, and Grafana to create a robust and highly configurable data pipeline.
-
-![Grafana Dashboard](https://i.imgur.com/your-grafana-dashboard-image.png)
-_**(NOTE: Please replace this link with an actual screenshot of your main Grafana dashboard.)**_
 
 ## 📖 Overview
 
@@ -99,7 +96,7 @@ When this validation fails, Pandera doesn't just return `False`. It raises a `Sc
 
 By placing Pandera at the heart of our ingestion process, we transform the pipeline from a passive receiver of information into an active guardian of data quality.
 
-## ✨ Key Features
+##  Key Features
 
 -   **Real-time Data Processing**: Ingests and processes MQTT data streams with low latency.
 -   **Dynamic Schema Validation**: Utilizes Pandera for robust data validation against user-defined JSON schemas.
@@ -110,7 +107,7 @@ By placing Pandera at the heart of our ingestion process, we transform the pipel
 -   **Advanced Visualization & Alerting**: Leverages Grafana to create detailed, interactive dashboards from both InfluxDB (historical data) and Prometheus (metrics), complete with a powerful, configurable alerting engine.
 -   **Containerized Environment**: The entire application stack is containerized with Docker and orchestrated with Docker Compose for one-command setup and consistent deployment across any environment.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 This project integrates a variety of powerful tools and libraries. The entire environment is managed by Docker Compose, ensuring version consistency and easy setup.
 
@@ -136,12 +133,10 @@ This project integrates a variety of powerful tools and libraries. The entire en
 |                           | Prometheus            | `v2.x`            | An open-source monitoring system for collecting application performance metrics. |
 |                           | Grafana               | `latest`          | An open-source platform for visualizing data and creating powerful alerts.       |
 
-## 🏗️ Architecture & Detailed Data Flow
+##  Architecture & Detailed Data Flow
 
 This project is built on a microservices-oriented architecture where each component has a distinct responsibility. All services are containerized using Docker, ensuring they operate in an isolated and consistent environment. This section provides a deep dive into the system's initialization, the journey of a single data message, and the dynamic configuration loop that makes the system truly flexible.
 
-![System Architecture Diagram](https://i.imgur.com/your-architecture-diagram.png)
-_**(NOTE: A diagram showing the relationships between publishers, MQTT broker, FastAPI app, InfluxDB, Prometheus, and Grafana would be highly effective here.)**_
 
 ### Stage 1: System Initialization
 
@@ -202,11 +197,11 @@ The system's true power lies in its ability to be reconfigured on the fly via th
     -   **InfluxDB**: For querying the rich, historical, raw data content using the Flux language (e.g., `SELECT humidity WHERE topic='/sensor1'`). This is for analyzing the *content* of the data.
 -   The **Alerting Engine** in Grafana continuously evaluates rules against both data sources, providing comprehensive monitoring of both system health and data quality.
 
-### Data Access and Integration Model
+### Data Access and Integration 
 
 The InfluxDB, Prometheus, and Grafana services do not directly subscribe to MQTT topics. Instead, the **FastAPI application (`fastapi_app`) acts as the central bridge and translator** for all of them. It is the only component that processes the raw MQTT messages, subsequently preparing and serving the data in formats that each specialized tool can understand.
 
-#### InfluxDB Integration (The "Push" Model)
+#### InfluxDB Integration 
 
 InfluxDB stores the rich, detailed content of every message. Our application actively **pushes** data to it.
 
@@ -215,7 +210,7 @@ InfluxDB stores the rich, detailed content of every message. Our application act
 3.  **The Action**: The writer constructs a data `Point` using the `influxdb-client` library. This `Point` is structured with a measurement (`mqtt_messages`), tags for easy filtering (like `status`, `topic`, `sensor_id`), and fields containing the actual data (like `temperature`, `humidity`, or the full JSON error report).
 4.  **The Result**: This data point is sent over HTTP to the InfluxDB container. InfluxDB receives it and stores it, making the full historical record of every message available for querying.
 
-#### Prometheus Integration (The "Pull" Model)
+#### Prometheus Integration
 
 Prometheus stores high-level performance metrics. It operates on a **pull** model, meaning it periodically scrapes (requests) data from our application.
 
@@ -225,14 +220,14 @@ Prometheus stores high-level performance metrics. It operates on a **pull** mode
 4.  **The Action**: The `prometheus.yml` configuration file tells the Prometheus container to "scrape" this `/metrics` endpoint every 15 seconds. Prometheus visits the URL, reads the values, and stores them in its own time-series database.
 5.  **The Result**: Prometheus builds a highly efficient database of our system's performance over time, without ever needing to know the content of the actual MQTT messages.
 
-#### Grafana's Role (The Unifier)
+#### Grafana's Role 
 
 Grafana is the final piece that brings everything together. It does not talk to our FastAPI application at all. Instead:
 -   It is configured with **two Data Sources**: one pointing to the Prometheus container (`http://prometheus:9090`) and another pointing to the InfluxDB container (`http://influxdb:8086`).
 -   When you view a dashboard, Grafana sends queries to these data sources—PromQL queries to Prometheus for performance metrics and Flux queries to InfluxDB for historical data content—and masterfully combines the results into the unified dashboards you see.
 
 
-## 🚀 Getting Started
+##  Getting Started
 
 Follow these instructions to get the entire project stack up and running on your local machine for development and testing purposes.
 
@@ -285,7 +280,7 @@ Make sure you have the following software installed on your system:
 
 That's it! The entire pipeline is now running.
 
-## 🕹️ Usage
+##  Usage
 
 Once all services are up and running, you can access the different parts of the system through your web browser. Each interface serves a unique purpose.
 
@@ -517,7 +512,7 @@ The project repository is organized to clearly separate concerns. Here are the m
 └── utils.py              # Utility functions, such as the Pandera error parser.
 ```
 
-## 🎯 Future Work & Known Limitations
+##  Future Work & Known Limitations
 
 This project provides a robust foundation for a real-time data validation pipeline. The following areas represent opportunities for future development and enhancement:
 
