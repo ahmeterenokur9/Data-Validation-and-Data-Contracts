@@ -402,7 +402,7 @@ Here are some examples of the queries that power our pre-configured Grafana dash
 **1. Visualizing a Specific Data Field (InfluxDB - Flux)**
 This query retrieves the historical `humidity` values for `sensor1`, allowing us to plot its trend over time.
 
-```influxql
+```bash
 // InfluxDB Flux Query
 from(bucket: "mqtt_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
