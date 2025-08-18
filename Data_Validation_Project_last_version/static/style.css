@@ -1,0 +1,401 @@
+/* Genel Stil Sıfırlama ve Temel Ayarlar */
+:root {
+    --bg-color: #f4f7fa;
+    --sidebar-bg: #ffffff;
+    --header-bg: #ffffff;
+    --card-bg: #ffffff;
+    --text-color: #333;
+    --light-text-color: #777;
+    --border-color: #e0e5eb;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --green-light: #e6f7f0;
+    --green-dark: #008744;
+    --red-light: #fdecea;
+    --red-dark: #d62d20;
+    --blue-light: #eaf2fa;
+    --blue-dark: #2a7de1;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Ana Konteyner ve Yerleşim */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+    height: 100vh;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* Başlık (Header) */
+.dashboard-header {
+    grid-area: header;
+    background-color: var(--header-bg);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.dashboard-header .ph-gauge {
+    color: var(--blue-dark);
+}
+
+/* Bağlantı Durumu */
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.status-light {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.connection-status.connected .status-light { background-color: var(--green-dark); }
+.connection-status.connecting .status-light { background-color: #f39c12; animation: pulse 1.5s infinite; }
+.connection-status.disconnected .status-light { background-color: var(--red-dark); }
+.connection-status.error .status-light { background-color: var(--red-dark); }
+
+
+/* Filtre Kenar Çubuğu (Sidebar) */
+.filter-sidebar {
+    grid-area: sidebar;
+    background-color: var(--sidebar-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sidebar-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    text-align: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-item .stat-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--blue-dark);
+}
+.stat-item:nth-child(2) .stat-value { color: var(--green-dark); }
+.stat-item:nth-child(3) .stat-value { color: var(--red-dark); }
+
+
+.stat-item .stat-label {
+    font-size: 0.8rem;
+    color: var(--light-text-color);
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+#error-type-filter-group {
+    transition: all 0.3s ease;
+}
+
+#error-type-filter-group.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    max-height: 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    transition: all 0.3s ease;
+}
+
+#clear-log-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--red-light);
+    color: var(--red-dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+#clear-log-btn:hover {
+    background-color: #fbd0cd;
+}
+
+.filter-group h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--light-text-color);
+    font-weight: 600;
+}
+
+.filter-group label {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.filter-group input[type="text"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-family);
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.button-group button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--blue-light);
+    color: var(--blue-dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.button-group button:hover {
+    background-color: #d8e6f5;
+}
+
+
+/* Mesaj Günlüğü (Main Content) */
+.message-log {
+    grid-area: main;
+    background-color: transparent;
+    overflow-y: auto;
+    padding-right: 0.5rem; /* for scrollbar */
+}
+
+/* Yer Tutucu (Placeholder) */
+.log-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: var(--light-text-color);
+}
+
+.log-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--blue-dark);
+}
+
+.log-placeholder p {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.log-placeholder.hidden {
+    display: none;
+}
+
+
+/* Mesaj Kartları */
+.message-card {
+    background-color: var(--card-bg);
+    border-left: 5px solid;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    transition: all 0.2s ease-in-out;
+}
+
+.message-card.validated { border-color: var(--green-dark); }
+.message-card.failed { border-color: var(--red-dark); }
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.card-topic {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.card-topic .ph {
+    margin-right: 0.3rem;
+}
+.message-card.validated .card-topic { color: var(--green-dark); }
+.message-card.failed .card-topic { color: var(--red-dark); }
+
+
+.card-timestamp {
+    font-size: 0.85rem;
+    color: var(--light-text-color);
+}
+
+.card-body {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+}
+
+.card-actions {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.view-toggle-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--light-text-color);
+    transition: all 0.2s;
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    color: var(--light-text-color);
+    cursor: pointer;
+    margin-left: auto;
+    padding: 0.25rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+.copy-btn:hover {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+.copy-btn .ph {
+    font-size: 1.2rem;
+}
+
+
+.view-toggle-btn.active {
+    background-color: var(--blue-light);
+    color: var(--blue-dark);
+    border-color: var(--blue-dark);
+}
+
+/* Pretty View Stilleri */
+.pretty-view {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+}
+.pretty-view .field-name {
+    font-weight: 600;
+    color: var(--text-color);
+}
+.pretty-view .field-value {
+    color: var(--light-text-color);
+    word-break: break-all;
+}
+
+/* Hata Detayları Stilleri */
+.error-details {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background-color: var(--red-light);
+    border-radius: 4px;
+}
+.error-details .field-name {
+    color: var(--red-dark);
+}
+.error-details .field-value {
+    color: #64110a;
+}
+
+/* Kaydırma Çubuğu Stilleri */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #999; }
+
+/* Animasyonlar */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+/* Gizli elemanlar için yardımcı sınıf */
+.hidden {
+    display: none !important;
+} 
