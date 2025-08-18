@@ -1,5 +1,7 @@
 # Data Validation & Monitoring Pipeline
 
+![Alternatif metin](images/example.png)
+
 A real-time, end-to-end solution for validating, processing, and visualizing IoT data streams. This project leverages a modern tech stack including MQTT, FastAPI, Pandera, InfluxDB, Prometheus, and Grafana to create a robust and highly configurable data pipeline.
 
 ## 📖 Overview
