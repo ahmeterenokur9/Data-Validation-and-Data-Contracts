@@ -505,18 +505,20 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 
 The project repository is organized to clearly separate concerns. Here are the most important files and directories:
 
-    .
-    ├── schemas/              # Contains all Pandera validation schemas in JSON format.
-    ├── sensors/              # Includes various Python scripts that simulate sensor data publication for testing.
-    ├── static/               # Frontend assets (HTML, CSS, JS) for the Admin Panel and Live Dashboard.
-    ├── config.json           # The heart of the system's configuration: MQTT settings and topic mappings.
-    ├── docker-compose.yml    # Orchestrates the deployment of all services (app, databases, monitoring).
-    ├── Dockerfile            # Defines the build process for the FastAPI application container.
-    ├── main.py               # The main FastAPI application file: handles APIs, WebSockets, and overall application state.
-    ├── mqtt_manager.py       # Core logic for the MQTT client: handles connections, message validation, and data routing.
-    ├── prometheus.yml        # Configuration file for Prometheus, defining scrape targets.
-    ├── requirements.txt      # Lists the Python dependencies for the application.
-    └── utils.py              # Utility functions, such as the Pandera error parser.
+```yaml
+.
+├── schemas/              # Contains all Pandera validation schemas in JSON format.
+├── sensors/              # Includes various Python scripts that simulate sensor data publication for testing.
+├── static/               # Frontend assets (HTML, CSS, JS) for the Admin Panel and Live Dashboard.
+├── config.json           # The heart of the system's configuration: MQTT settings and topic mappings.
+├── docker-compose.yml    # Orchestrates the deployment of all services (app, databases, monitoring).
+├── Dockerfile            # Defines the build process for the FastAPI application container.
+├── main.py               # The main FastAPI application file: handles APIs, WebSockets, and overall application state.
+├── mqtt_manager.py       # Core logic for the MQTT client: handles connections, message validation, and data routing.
+├── prometheus.yml        # Configuration file for Prometheus, defining scrape targets.
+├── requirements.txt      # Lists the Python dependencies for the application.
+└── utils.py              # Utility functions, such as the Pandera error parser.
+
 
 ## 🎯 Future Work & Known Limitations
 
