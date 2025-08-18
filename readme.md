@@ -1,7 +1,5 @@
 # Data Validation & Monitoring Pipeline
 
-![Alternatif metin](images/4.png)
-
 A real-time, end-to-end solution for validating, processing, and visualizing IoT data streams. This project leverages a modern tech stack including MQTT, FastAPI, Pandera, InfluxDB, Prometheus, and Grafana to create a robust and highly configurable data pipeline.
 
 ## 📖 Overview
@@ -136,6 +134,8 @@ This project integrates a variety of powerful tools and libraries. The entire en
 |                           | Grafana               | `latest`          | An open-source platform for visualizing data and creating powerful alerts.       |
 
 ##  Architecture & Detailed Data Flow
+
+![Alternatif metin](images/resim.png)
 
 This project is built on a microservices-oriented architecture where each component has a distinct responsibility. All services are containerized using Docker, ensuring they operate in an isolated and consistent environment. This section provides a deep dive into the system's initialization, the journey of a single data message, and the dynamic configuration loop that makes the system truly flexible.
 
@@ -288,6 +288,8 @@ Once all services are up and running, you can access the different parts of the 
 
 ### Admin Panel: `http://localhost:8000/admin`
 
+![Alternatif metin](images/resim.png)
+
 **What it is**: The central control room for the entire data pipeline.
 
 **Purpose**: This web interface gives you complete, real-time control over the data pipeline's configuration. All changes made here are applied instantly without needing to restart any services, allowing for true dynamic behavior.
@@ -342,6 +344,8 @@ This entire process happens in seconds, providing a seamless and truly dynamic c
 
 ### Live Data Dashboard: `http://localhost:8000/dashboard`
 
+![Alternatif metin](images/resim.png)
+
 **What it is**: A real-time, lightweight message feed designed for immediate operational awareness.
 
 **Purpose**: While Grafana is used for deep analysis and historical trends, the Live Data Dashboard serves a different, more immediate purpose: to provide a live, unfiltered view of the data pipeline's pulse. It answers the question, "What is happening in the system *right now*?"
@@ -366,6 +370,8 @@ This direct connection to the message bus makes it incredibly fast and efficient
 ---
 
 ### Grafana Dashboards: `http://localhost:3000`
+
+![Alternatif metin](images/resim.png)
 
 **What it is**: The main platform for advanced data visualization, long-term analysis, and alerting.
 
@@ -419,11 +425,14 @@ rate(mqtt_messages_processed_total{sensor_id="sensor1", status="validated"}[1m])
 ```
 
 **3. Counting Total Failures by Error Type (Prometheus - PromQL)**
+
 This query counts the total increase in failed messages over the selected time range and groups them by the `error_type`. This is ideal for a pie chart or bar chart to quickly identify the most common data quality issues.
 
 ```bash
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
+![Alternatif metin](images/resim.png)
+
 
 #### The Alerting System
 
@@ -448,6 +457,8 @@ This is a guide for understanding the logic behind our alerts. You can follow th
       |> last() // We only care about the most recent value
     ```
 
+![Alternatif metin](images/resim.png)
+
 3.  **The Condition (The Trigger Rule)**: The core of the alert is a simple but powerful condition:
     -   `WHEN` **`last()`** `OF` **`query_result`** `IS ABOVE` **`1.0`**
     -   This tells Grafana: "Look at the single, most recent value returned by our query. If that value is greater than 1.0, the condition is met."
@@ -467,6 +478,8 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 
 ### Prometheus UI: `http://localhost:9090`
 
+![Alternatif metin](images/resim.png)
+
 **What it is**: The raw, built-in user interface for the Prometheus monitoring system.
 
 **Login**: No authentication is configured by default.
@@ -480,6 +493,8 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 ---
 
 ### InfluxDB UI: `http://localhost:8086`
+
+![Alternatif metin](images/resim.png)
 
 **What it is**: A powerful web-based data management and administration interface for the InfluxDB database.
 
