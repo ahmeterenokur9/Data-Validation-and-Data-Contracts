@@ -344,7 +344,7 @@ This entire process happens in seconds, providing a seamless and truly dynamic c
 
 ### Live Data Dashboard: `http://localhost:8000/dashboard`
 
-![Dashboard](images/dasgboard.jpeg)
+![Dashboard](images/dashboard.jpeg)
 
 **What it is**: A real-time, lightweight message feed designed for immediate operational awareness.
 
@@ -371,7 +371,7 @@ This direct connection to the message bus makes it incredibly fast and efficient
 
 ### Grafana Dashboards: `http://localhost:3000`
 
-![Grafana](images/grafana.jped)
+![Grafana](images/grafana.jpeg)
 
 **What it is**: The main platform for advanced data visualization, long-term analysis, and alerting.
 
@@ -431,7 +431,8 @@ This query counts the total increase in failed messages over the selected time r
 ```bash
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
-![Errors](images/error types.jpeg)
+
+![Errors](images/errortypes.jpeg)
 
 
 #### The Alerting System
