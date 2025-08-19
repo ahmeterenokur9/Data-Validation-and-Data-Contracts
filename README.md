@@ -288,7 +288,7 @@ Once all services are up and running, you can access the different parts of the 
 
 ### Admin Panel: `http://localhost:8000/admin`
 
-![Dashboard](images/dashboard.jpeg)
+![Admin](images/admin.jpeg)
 
 **What it is**: The central control room for the entire data pipeline.
 
@@ -344,7 +344,7 @@ This entire process happens in seconds, providing a seamless and truly dynamic c
 
 ### Live Data Dashboard: `http://localhost:8000/dashboard`
 
-![Alternatif metin](images/resim.png)
+![Dashboard](images/dasgboard.jpeg)
 
 **What it is**: A real-time, lightweight message feed designed for immediate operational awareness.
 
@@ -371,7 +371,7 @@ This direct connection to the message bus makes it incredibly fast and efficient
 
 ### Grafana Dashboards: `http://localhost:3000`
 
-![Alternatif metin](images/resim.png)
+![Grafana](images/grafana.jped)
 
 **What it is**: The main platform for advanced data visualization, long-term analysis, and alerting.
 
@@ -431,7 +431,7 @@ This query counts the total increase in failed messages over the selected time r
 ```bash
 sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
 ```
-![Alternatif metin](images/resim.png)
+![Errors](images/error types.jpeg)
 
 
 #### The Alerting System
@@ -457,7 +457,7 @@ This is a guide for understanding the logic behind our alerts. You can follow th
       |> last() // We only care about the most recent value
     ```
 
-![Alternatif metin](images/resim.png)
+![Radiation](images/radiation.jpeg)
 
 3.  **The Condition (The Trigger Rule)**: The core of the alert is a simple but powerful condition:
     -   `WHEN` **`last()`** `OF` **`query_result`** `IS ABOVE` **`1.0`**
@@ -478,7 +478,6 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 
 ### Prometheus UI: `http://localhost:9090`
 
-![Alternatif metin](images/resim.png)
 
 **What it is**: The raw, built-in user interface for the Prometheus monitoring system.
 
@@ -494,7 +493,6 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 
 ### InfluxDB UI: `http://localhost:8086`
 
-![Alternatif metin](images/resim.png)
 
 **What it is**: A powerful web-based data management and administration interface for the InfluxDB database.
 
