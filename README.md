@@ -288,7 +288,7 @@ Once all services are up and running, you can access the different parts of the 
 
 ### Admin Panel: `http://localhost:8000/admin`
 
-![Alternatif metin](images/resim.png)
+![Dashboard](images/dashboard.jpeg)
 
 **What it is**: The central control room for the entire data pipeline.
 
