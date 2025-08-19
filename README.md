@@ -135,7 +135,7 @@ This project integrates a variety of powerful tools and libraries. The entire en
 
 ##  Architecture & Detailed Data Flow
 
-![Data Flow](images/dataflow.jpef)
+![Data Flow](images/dataflow.jpeg)
 
 This project is built on a microservices-oriented architecture where each component has a distinct responsibility. All services are containerized using Docker, ensuring they operate in an isolated and consistent environment. This section provides a deep dive into the system's initialization, the journey of a single data message, and the dynamic configuration loop that makes the system truly flexible.
 
