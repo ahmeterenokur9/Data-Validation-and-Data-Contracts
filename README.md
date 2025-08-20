@@ -13,13 +13,13 @@ Validated and failed data points are intelligently separated. Time-series data i
 ## 📚 Table of Contents
 
 - [Data Validation and Contracts with Pandera](#data-validation-and-contracts-with-pandera)
-- [Key Features](key-features)
-- [Tech Stack](tech-stack)
-- [Architecture & Detailed Data Flow](architecture--detailed-data-flow)
-- [Getting Started](getting-started)
-- [Usage](usage)
-- [Project Structure](project-structure)
-- [Future Work & Known Limitations](future-work--known-limitations)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Architecture & Detailed Data Flow](#architecture--detailed-data-flow)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Future Work & Known Limitations](#future-work--known-limitations)
 
 ## Data Validation and Contracts with Pandera
 
@@ -509,7 +509,7 @@ This same logic is applied to other pre-configured alerts, such as the **High Hu
 -   **Buckets Management**: You can view the `mqtt_data` bucket, see its current retention policies (how long data is stored), and manage other database settings.
 -   **Load Data**: While our project writes data via the API, this section allows you to manually upload or paste sample data, which can be useful for testing specific scenarios.
 
-## 📂 Project Structure
+##  Project Structure
 
 The project repository is organized to clearly separate concerns. Here are the most important files and directories:
 
