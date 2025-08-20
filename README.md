@@ -21,7 +21,7 @@ Validated and failed data points are intelligently separated. Time-series data i
 - [Project Structure](project-structure)
 - [Future Work & Known Limitations](future-work--known-limitations)
 
-## Data Validation adn Contracts with Pandera
+## Data Validation and Contracts with Pandera
 
 In any data-driven system, especially in the world of IoT where data streams from countless diverse sources, the principle of "Garbage In, Garbage Out" holds true. Unreliable, malformed, or unexpected data can cause silent failures, corrupt databases, and lead to flawed analysis. This project's first and most critical objective is to act as a guardian of data quality.
 
