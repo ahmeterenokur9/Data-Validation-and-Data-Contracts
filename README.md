@@ -532,6 +532,10 @@ The project repository is organized to clearly separate concerns. Here are the m
 
 This project provides a robust foundation for a real-time data validation pipeline. The following areas represent opportunities for future development and enhancement:
 
+-   **Potential for Data Loss During Reconfiguration**: The current dynamic configuration mechanism works by gracefully restarting the internal MQTT client. While this process is very fast, there is a brief moment during the restart when the client is disconnected. In high-frequency data environments (multiple messages per second), this could lead to a small window where messages might be missed. A more advanced implementation could use a blue-green or zero-downtime deployment pattern for the MQTT client itself.
+
+-   **Configuration Update Scalability**: The Admin Panel APIs currently update configuration by rewriting the entire configuration block (e.g., all topic mappings) with a `POST` request. While simple and effective for a small number of configurations, this approach is not optimal for very large-scale deployments with hundreds or thousands of mappings. A more scalable design would use `PATCH` or `PUT` requests to update individual configuration entries, reducing network payload and processing overhead.
+
 -   **Enhanced Security Layer**: The current implementation lacks authentication and authorization for the Admin Panel and its corresponding APIs. A crucial next step for any production-like environment would be to implement a robust security layer (e.g., using OAuth2 or API keys) to protect sensitive system configurations.
 
 -   **Configurable Alert Notifications**: Grafana's alerting engine is capable of sending notifications to various channels (Email, Slack, PagerDuty, etc.). A key improvement would be to fully configure and document these notification channels, transforming alerts from simple dashboard indicators into actionable, real-time notifications.
