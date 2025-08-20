@@ -12,14 +12,14 @@ Validated and failed data points are intelligently separated. Time-series data i
 
 ## 📚 Table of Contents
 
-- [Data Validation and Contracts with Pandera](#-data-validation-and-contracts-with-pandera)
-- [Key Features](#-key-features)
-- [Tech Stack](#️-tech-stack)
-- [Architecture & Detailed Data Flow](#️-architecture--detailed-data-flow)
-- [Getting Started](#-getting-started)
-- [Usage](#️-usage)
-- [Project Structure](#-project-structure)
-- [Future Work & Known Limitations](#-future-work--known-limitations)
+- [Data Validation and Contracts with Pandera](data-validation-and-contracts-with-pandera)
+- [Key Features](key-features)
+- [Tech Stack](tech-stack)
+- [Architecture & Detailed Data Flow](architecture--detailed-data-flow)
+- [Getting Started](getting-started)
+- [Usage](usage)
+- [Project Structure](project-structure)
+- [Future Work & Known Limitations](future-work--known-limitations)
 
 ## Data Validation adn Contracts with Pandera
 
