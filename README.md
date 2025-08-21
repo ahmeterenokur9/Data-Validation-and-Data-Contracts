@@ -398,7 +398,7 @@ Understanding why we use two data sources is key to understanding the system's o
 
 By combining these two, we can answer complex questions, such as "Did the rate of `out_of_range` errors increase after the per-second message rate spiked?"
 
-#### Key Dashboard Panels
+#### Key Prometheus-Powered Panels
 Here are some examples of the key panels from our pre-configured Grafana dashboard. These panels use PromQL queries to visualize both the overall health and the granular details of the data pipeline. You can replace the image paths below with screenshots of your own panels.
 
 ---
@@ -406,7 +406,7 @@ Here are some examples of the key panels from our pre-configured Grafana dashboa
 ##### Total Validated vs. Failed Messages
 This panel provides a high-level overview of data quality. By visualizing the total counts of validated and failed messages, you can instantly assess the overall health and reliability of your data streams. It's ideal for a pie chart.
 
-![Total Validated vs. Failed Messages](images/total_validated_vs_failed.png)
+![Total Validated vs. Failed Messages](images/overall.jpeg)
 
 **Query:**
 ```promql
@@ -418,7 +418,7 @@ sum(increase(mqtt_messages_processed_total[$__range])) by (status)
 ##### Real-time Validation Success Rate (%)
 This panel acts as a real-time health gauge for the data pipeline. It calculates the percentage of messages that passed validation over the last five minutes. A value close to 100% indicates a healthy system and is perfect for a Gauge panel.
 
-![Success Rate Gauge](images/success_rate_gauge.png)
+![Success Rate Gauge](images/succes.jpeg)
 
 **Query:**
 ```promql
@@ -433,7 +433,7 @@ sum(increase(mqtt_messages_processed_total[5m]))
 ##### Grand Total Messages Processed
 A simple but important "Stat" panel that shows the cumulative number of all messages processed by the pipeline since it started. This helps in understanding the total volume of data flowing through the system.
 
-![Grand Total Messages](images/grand_total_messages.png)
+![Grand Total Messages](images/total.jpeg)
 
 **Query:**
 ```promql
@@ -445,7 +445,7 @@ sum(mqtt_messages_processed_total)
 ##### Failure Rate by Sensor
 This panel is crucial for diagnostics. It breaks down the per-second rate of failed messages for each individual sensor. By using a bar chart, you can quickly identify which specific sensors are producing invalid data, allowing for targeted troubleshooting.
 
-![Failure Rate by Sensor](images/failure_rate_by_sensor.png)
+![Failure Rate by Sensor](images/error_rate.jpeg)
 
 **Query:**
 ```promql
@@ -456,14 +456,14 @@ sum(rate(mqtt_messages_processed_total{status="failed"}[5m])) by (sensor_id)
 
 Beyond simple visualization, one of Grafana's most powerful capabilities is its integrated alerting engine. Instead of requiring a user to passively watch dashboards, the system can be configured to proactively issue alerts when data breaches predefined thresholds. This section explains how this system works, using our critical **High Radiation Alert** as a case study.
 
-**How to Recreate or Understand an Alert (Case Study: High Radiation)**
+**How to Recreate or Understand an Alert (Case Study 1: High Radiation)**
 
 This is a guide for understanding the logic behind our alerts. You can follow these steps in the Grafana UI by editing the "Live Radiation Level" panel and navigating to the "Alert" tab.
 
 1.  **The Goal**: The objective is to trigger an alert instantly if the `radiation_level` from `sensor4` exceeds a critical safety threshold of `1.0 µSv/h`.
 
 2.  **The Data Source & Query (InfluxDB)**: First, we need to isolate the exact data point to monitor. The alert rule is attached to a panel that uses the following Flux query to get the latest radiation level from InfluxDB:
-    ```bash
+    ```flux
     from(bucket: "mqtt_data")
       |> range(start: -1m) // Look at recent data
       |> filter(fn: (r) =>
@@ -475,8 +475,6 @@ This is a guide for understanding the logic behind our alerts. You can follow th
       |> last() // We only care about the most recent value
     ```
 
-![Radiation](images/radiation.jpeg)
-
 3.  **The Condition (The Trigger Rule)**: The core of the alert is a simple but powerful condition:
     -   `WHEN` **`last()`** `OF` **`query_result`** `IS ABOVE` **`1.0`**
     -   This tells Grafana: "Look at the single, most recent value returned by our query. If that value is greater than 1.0, the condition is met."
@@ -484,6 +482,32 @@ This is a guide for understanding the logic behind our alerts. You can follow th
 4.  **The Evaluation Behavior (The Speed)**: This defines how quickly the system reacts.
     -   **Evaluation Interval**: The rule is evaluated every **`10 seconds`**. This means Grafana checks the radiation level against the threshold six times per minute, providing rapid detection.
     -   **Pending Period (`For`)**: This is set to **`0s`**. This is critical. It means the moment the condition is met, the alert immediately enters the `Firing` state without any delay. For less critical alerts, you might set this to `1m` to avoid alerts from brief, transient spikes.
+
+---
+
+**Case Study 2: High Humidity Alert**
+
+1.  **The Goal**: The objective is to trigger an alert if the `humidity` from `sensor1` goes above a potentially damaging threshold of `85%`. This is a less critical alert than radiation, so it has a built-in delay to avoid firing on brief, transient spikes.
+
+2.  **The Data Source & Query (InfluxDB)**: We use a Flux query to get the latest humidity reading.
+    ```flux
+    from(bucket: "mqtt_data")
+      |> range(start: -10m) // Look at recent data over a slightly wider window
+      |> filter(fn: (r) =>
+        r._measurement == "mqtt_messages" and
+        r.status == "validated" and
+        r.topic == "/sensor1" and
+        r._field == "humidity"
+      )
+      |> last() // We only care about the most recent value
+    ```
+
+3.  **The Condition (The Trigger Rule)**:
+    -   `WHEN` **`last()`** `OF` **`query_result`** `IS ABOVE` **`85`**
+
+4.  **The Evaluation Behavior (The Speed & Delay)**:
+    -   **Evaluation Interval**: Every **`1 minute`**.
+    -   **Pending Period (`For`)**: **`5m`**. This is the key difference. The alert will only enter the `Firing` state if the condition remains true for 5 consecutive minutes. This prevents "flapping" alerts from temporary spikes in humidity.
 
 **What Happens When an Alert Fires?**
 -   The border of the panel on the dashboard will turn red and show a pulsing heartbeat icon.
