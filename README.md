@@ -398,42 +398,59 @@ Understanding why we use two data sources is key to understanding the system's o
 
 By combining these two, we can answer complex questions, such as "Did the rate of `out_of_range` errors increase after the per-second message rate spiked?"
 
-#### Example Queries Used in Our Dashboards
+#### Key Dashboard Panels
+Here are some examples of the key panels from our pre-configured Grafana dashboard. These panels use PromQL queries to visualize both the overall health and the granular details of the data pipeline. You can replace the image paths below with screenshots of your own panels.
 
-Here are some examples of the queries that power our pre-configured Grafana dashboard, showcasing how we use both data sources.
+---
 
-**1. Visualizing a Specific Data Field (InfluxDB - Flux)**
-This query retrieves the historical `humidity` values for `sensor1`, allowing us to plot its trend over time.
+##### Total Validated vs. Failed Messages
+This panel provides a high-level overview of data quality. By visualizing the total counts of validated and failed messages, you can instantly assess the overall health and reliability of your data streams. It's ideal for a pie chart.
 
-```bash
-from(bucket: "mqtt_data")
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) =>
-    r._measurement == "mqtt_messages" and
-    r.status == "validated" and
-    r.topic == "/sensor1" and
-    r._field == "humidity"
-  )
-  |> yield(name: "humidity")
+![Total Validated vs. Failed Messages](images/total_validated_vs_failed.png)
+
+**Query:**
+```promql
+sum(increase(mqtt_messages_processed_total[$__range])) by (status)
 ```
 
-**2. Calculating the Live Message Rate (Prometheus - PromQL)**
-This query calculates the per-second average rate of `validated` messages from `sensor1` over the last minute. This is perfect for a "Stat" or "Gauge" panel to show live throughput.
+---
 
-```bash
-rate(mqtt_messages_processed_total{sensor_id="sensor1", status="validated"}[1m])
+##### Real-time Validation Success Rate (%)
+This panel acts as a real-time health gauge for the data pipeline. It calculates the percentage of messages that passed validation over the last five minutes. A value close to 100% indicates a healthy system and is perfect for a Gauge panel.
+
+![Success Rate Gauge](images/success_rate_gauge.png)
+
+**Query:**
+```promql
+sum(increase(mqtt_messages_processed_total{status="validated"}[5m])) 
+/ 
+sum(increase(mqtt_messages_processed_total[5m]))
+* 100
 ```
 
-**3. Counting Total Failures by Error Type (Prometheus - PromQL)**
+---
 
-This query counts the total increase in failed messages over the selected time range and groups them by the `error_type`. This is ideal for a pie chart or bar chart to quickly identify the most common data quality issues.
+##### Grand Total Messages Processed
+A simple but important "Stat" panel that shows the cumulative number of all messages processed by the pipeline since it started. This helps in understanding the total volume of data flowing through the system.
 
-```bash
-sum(increase(mqtt_messages_processed_total{status="failed"}[$__range])) by (error_type)
+![Grand Total Messages](images/grand_total_messages.png)
+
+**Query:**
+```promql
+sum(mqtt_messages_processed_total)
 ```
 
-![Errors](images/errortypes.jpeg)
+---
 
+##### Failure Rate by Sensor
+This panel is crucial for diagnostics. It breaks down the per-second rate of failed messages for each individual sensor. By using a bar chart, you can quickly identify which specific sensors are producing invalid data, allowing for targeted troubleshooting.
+
+![Failure Rate by Sensor](images/failure_rate_by_sensor.png)
+
+**Query:**
+```promql
+sum(rate(mqtt_messages_processed_total{status="failed"}[5m])) by (sensor_id)
+```
 
 #### The Alerting System
 
