@@ -418,7 +418,7 @@ sum(increase(mqtt_messages_processed_total[$__range])) by (status)
 ##### Real-time Validation Success Rate (%)
 This panel acts as a real-time health gauge for the data pipeline. It calculates the percentage of messages that passed validation over the last five minutes. A value close to 100% indicates a healthy system and is perfect for a Gauge panel.
 
-![Success Rate Gauge](images/succes.jpeg)
+![Success Rate Gauge](images/succes_rate.jpeg)
 
 **Query:**
 ```promql
@@ -460,6 +460,8 @@ Beyond simple visualization, one of Grafana's most powerful capabilities is its 
 
 This is a guide for understanding the logic behind our alerts. You can follow these steps in the Grafana UI by editing the "Live Radiation Level" panel and navigating to the "Alert" tab.
 
+![High Radiation Alert](images/radiation.jpeg)
+
 1.  **The Goal**: The objective is to trigger an alert instantly if the `radiation_level` from `sensor4` exceeds a critical safety threshold of `1.0 µSv/h`.
 
 2.  **The Data Source & Query (InfluxDB)**: First, we need to isolate the exact data point to monitor. The alert rule is attached to a panel that uses the following Flux query to get the latest radiation level from InfluxDB:
@@ -487,7 +489,11 @@ This is a guide for understanding the logic behind our alerts. You can follow th
 
 **Case Study 2: High Humidity Alert**
 
-1.  **The Goal**: The objective is to trigger an alert if the `humidity` from `sensor1` goes above a potentially damaging threshold of `85%`. This is a less critical alert than radiation, so it has a built-in delay to avoid firing on brief, transient spikes.
+This alert demonstrates a non-critical threshold with a built-in delay to prevent alerts from brief, transient spikes.
+
+![High Humidity Alert](images/humidity.jpeg)
+
+1.  **The Goal**: The objective is to trigger an alert if the `humidity` from `sensor1` goes above a potentially damaging threshold of `95%`. This is a less critical alert than radiation, so it has a built-in delay to avoid firing on brief, transient spikes.
 
 2.  **The Data Source & Query (InfluxDB)**: We use a Flux query to get the latest humidity reading.
     ```flux
@@ -503,7 +509,7 @@ This is a guide for understanding the logic behind our alerts. You can follow th
     ```
 
 3.  **The Condition (The Trigger Rule)**:
-    -   `WHEN` **`last()`** `OF` **`query_result`** `IS ABOVE` **`85`**
+    -   `WHEN` **`last()`** `OF` **`query_result`** `IS ABOVE` **`95`**
 
 4.  **The Evaluation Behavior (The Speed & Delay)**:
     -   **Evaluation Interval**: Every **`1 minute`**.
