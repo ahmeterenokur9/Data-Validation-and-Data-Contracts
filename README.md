@@ -2,7 +2,7 @@
 
 A real-time, end-to-end solution for validating, processing, and visualizing IoT data streams. This project leverages a modern tech stack including MQTT, FastAPI, Pandera, InfluxDB, Prometheus, and Grafana to create a robust and highly configurable data pipeline.
 
-## 📖 Overview
+## 📖 Overview 
 
 This project provides a complete ecosystem that captures raw MQTT messages, validates them against dynamic, user-defined schemas, and routes them for persistent storage and real-time visualization.
 
