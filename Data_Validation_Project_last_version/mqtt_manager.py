@@ -17,9 +17,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS, ASYNCHRONOUS
 # Prometheus specific import
 from prometheus_client import Counter
 
-# --- Prometheus Metrics Definition ---
-# This Counter will track the number of messages processed.
-# We use labels to distinguish between different outcomes.
+
 MESSAGES_PROCESSED = Counter(
     'mqtt_messages_processed_total',
     'Total number of processed MQTT messages',
@@ -42,6 +40,7 @@ class InfluxDBWriter:
 
         print(f"[InfluxDB] Initializing writer for bucket '{self.bucket}'...")
         self.client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
+        # Use ASYNCHRONOUS for high performance. It writes in batches in the background.
         self.write_api = self.client.write_api(write_options=ASYNCHRONOUS)
 
     def write_validated_data(self, topic, data):
@@ -61,7 +60,8 @@ class InfluxDBWriter:
                 # Ensure value is of a type InfluxDB can ingest (str, float, int, bool)
                 if isinstance(value, (str, float, int, bool)):
                     point.field(key, value)
-                    
+        
+
 
         self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
@@ -73,6 +73,7 @@ class InfluxDBWriter:
         primary_error = fail_report.get("errors", [{}])[0]
         error_type = primary_error.get("error_type", "unknown")
         error_column = primary_error.get("column", "unknown")
+
 
         clean_sensor_id = topic.strip("/")
 
@@ -100,6 +101,11 @@ mqtt_thread = None
 stop_event = threading.Event()
 
 def build_schema_from_json(schema_json: dict) -> pa.DataFrameSchema:
+    """
+    Dynamically builds a Pandera DataFrameSchema from a JSON definition.
+    This version is enhanced to support more DataFrameSchema properties like
+    'index', 'ordered', 'unique', etc., by passing them as kwargs.
+    """
     
     # Start with a copy of the schema definition to safely manipulate it.
     schema_kwargs = schema_json.copy()
@@ -130,9 +136,10 @@ def build_schema_from_json(schema_json: dict) -> pa.DataFrameSchema:
             coerce=col_props.get("coerce", schema_kwargs.get("coerce", False))
         )
     
+    # Handle Index and MultiIndex
     index_config = schema_kwargs.pop("index", None)
     if index_config:
-        if isinstance(index_config, list): 
+        if isinstance(index_config, list): # It's a MultiIndex
             index_list = []
             for item in index_config:
                 index_list.append(
@@ -142,7 +149,7 @@ def build_schema_from_json(schema_json: dict) -> pa.DataFrameSchema:
                     )
                 )
             schema_kwargs["index"] = pa.MultiIndex(index_list)
-        else: 
+        else: # It's a single Index
              schema_kwargs["index"] = pa.Index(
                 dtype=index_config.get("dtype"),
                 name=index_config.get("name")
@@ -207,9 +214,9 @@ class MQTTClient:
         # Find the corresponding mapping for the source topic
         mapping = self.topic_mappings.get(source_topic)
         if not mapping:
-            # This is a normal and expected case if publishers for unmapped topics are running.
-            # print(f"[MQTT-DEBUG] No mapping found for topic '{source_topic}'. Ignoring message.")
+
             return
+
 
 
         try:
@@ -235,6 +242,7 @@ class MQTTClient:
             schema = self.schemas.get(schema_path) # Get schema by path, not topic
             if not schema:
                 print(f"[MQTT] Schema '{schema_path}' not loaded for topic {source_topic}. Skipping validation.")
+                # Optionally, treat as valid if schema file is missing or failed to load
                 client.publish(mapping["validated"], payload, retain=False)
                 # Write to InfluxDB
                 self.influx_writer.write_validated_data(source_topic, data)
@@ -316,7 +324,7 @@ class MQTTClient:
             self.client.loop(timeout=1.0)
         
         print("[MQTT] Loop stopped.")
-        self.influx_writer.close() 
+        self.influx_writer.close() # <-- ADD THIS LINE
         self.client.disconnect()
         print("[MQTT] Disconnected.")
 
@@ -351,6 +359,7 @@ def stop_mqtt_client():
     global mqtt_thread, stop_event
     
 
+
     if mqtt_thread and mqtt_thread.is_alive():
         print("[MQTT] Stopping client thread...")
         stop_event.set()
@@ -360,7 +369,7 @@ def stop_mqtt_client():
         else:
             print("[MQTT] Client thread stopped.")
     
-   
+
     
     mqtt_thread = None
 
