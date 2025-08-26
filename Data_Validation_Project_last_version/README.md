@@ -330,7 +330,7 @@ The editor has two modes, allowing both technical and non-technical users to man
     -   For each column, you can add multiple `Checks` to enforce specific rules (e.g., `in_range`, `greater_than`, `str_matches` for regex).
 -   **Raw Text (JSON) Editor**: For advanced users, this mode allows you to view, edit, or paste the schema definition as a raw, strict JSON object. The system automatically syncs the content between the Visual and Raw editors.
 
-**How it Works (The Magic of Dynamic Configuration):**
+**How it Works (The Dynamic Configuration):**
 When you save any change in the Admin Panel (be it MQTT settings, mappings, or a schema), the following happens in sequence:
 1.  The frontend sends the updated configuration to the backend API.
 2.  The backend (`main.py`) persists the changes to the appropriate file (`config.json` or a file in `schemas/`).
