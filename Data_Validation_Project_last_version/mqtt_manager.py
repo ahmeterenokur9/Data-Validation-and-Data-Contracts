@@ -42,7 +42,6 @@ class InfluxDBWriter:
 
         print(f"[InfluxDB] Initializing writer for bucket '{self.bucket}'...")
         self.client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
-        # Use ASYNCHRONOUS for high performance. It writes in batches in the background.
         self.write_api = self.client.write_api(write_options=ASYNCHRONOUS)
 
     def write_validated_data(self, topic, data):
@@ -62,10 +61,7 @@ class InfluxDBWriter:
                 # Ensure value is of a type InfluxDB can ingest (str, float, int, bool)
                 if isinstance(value, (str, float, int, bool)):
                     point.field(key, value)
-        
-        # Do not set the timestamp manually. Let InfluxDB assign it upon arrival.
-        # This is the most robust way to handle timestamps for real-time data.
-        # point.time(data.get("timestamp"))
+                    
 
         self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
@@ -78,8 +74,6 @@ class InfluxDBWriter:
         error_type = primary_error.get("error_type", "unknown")
         error_column = primary_error.get("column", "unknown")
 
-        # CRITICAL FIX: The sensor_id tag should ALWAYS be derived from the trusted
-        # source topic, not from the potentially corrupt data in the fail_report.
         clean_sensor_id = topic.strip("/")
 
         point = Point("mqtt_messages") \
@@ -106,11 +100,6 @@ mqtt_thread = None
 stop_event = threading.Event()
 
 def build_schema_from_json(schema_json: dict) -> pa.DataFrameSchema:
-    """
-    Dynamically builds a Pandera DataFrameSchema from a JSON definition.
-    This version is enhanced to support more DataFrameSchema properties like
-    'index', 'ordered', 'unique', etc., by passing them as kwargs.
-    """
     
     # Start with a copy of the schema definition to safely manipulate it.
     schema_kwargs = schema_json.copy()
@@ -141,10 +130,9 @@ def build_schema_from_json(schema_json: dict) -> pa.DataFrameSchema:
             coerce=col_props.get("coerce", schema_kwargs.get("coerce", False))
         )
     
-    # Handle Index and MultiIndex
     index_config = schema_kwargs.pop("index", None)
     if index_config:
-        if isinstance(index_config, list): # It's a MultiIndex
+        if isinstance(index_config, list): 
             index_list = []
             for item in index_config:
                 index_list.append(
@@ -154,7 +142,7 @@ def build_schema_from_json(schema_json: dict) -> pa.DataFrameSchema:
                     )
                 )
             schema_kwargs["index"] = pa.MultiIndex(index_list)
-        else: # It's a single Index
+        else: 
              schema_kwargs["index"] = pa.Index(
                 dtype=index_config.get("dtype"),
                 name=index_config.get("name")
@@ -223,8 +211,6 @@ class MQTTClient:
             # print(f"[MQTT-DEBUG] No mapping found for topic '{source_topic}'. Ignoring message.")
             return
 
-        # Debug log to show which mapping is being used
-        # print(f"[MQTT-DEBUG] Using mapping for '{source_topic}': Target-V: '{mapping['validated']}', Target-F: '{mapping['failed']}'")
 
         try:
             payload = msg.payload.decode()
@@ -249,7 +235,6 @@ class MQTTClient:
             schema = self.schemas.get(schema_path) # Get schema by path, not topic
             if not schema:
                 print(f"[MQTT] Schema '{schema_path}' not loaded for topic {source_topic}. Skipping validation.")
-                # Optionally, treat as valid if schema file is missing or failed to load
                 client.publish(mapping["validated"], payload, retain=False)
                 # Write to InfluxDB
                 self.influx_writer.write_validated_data(source_topic, data)
@@ -331,7 +316,7 @@ class MQTTClient:
             self.client.loop(timeout=1.0)
         
         print("[MQTT] Loop stopped.")
-        self.influx_writer.close() # <-- ADD THIS LINE
+        self.influx_writer.close() 
         self.client.disconnect()
         print("[MQTT] Disconnected.")
 
@@ -365,12 +350,6 @@ def start_mqtt_client():
 def stop_mqtt_client():
     global mqtt_thread, stop_event
     
-    # We need to find the writer instance to close it.
-    # This is a bit tricky with the current global thread structure,
-    # but we can try to get it from the thread object if we store it there.
-    # For now, we will handle this inside the thread's stop sequence.
-    # The InfluxDBWriter's __del__ or atexit could also be options,
-    # but a clean shutdown is best.
 
     if mqtt_thread and mqtt_thread.is_alive():
         print("[MQTT] Stopping client thread...")
@@ -381,10 +360,7 @@ def stop_mqtt_client():
         else:
             print("[MQTT] Client thread stopped.")
     
-    # This part is tricky as the influx_writer is local to start_mqtt_client
-    # Let's modify MQTTClient.start() to handle the cleanup.
-    # In MQTTClient.start(), after the loop:
-    # self.influx_writer.close()
+   
     
     mqtt_thread = None
 
