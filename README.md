@@ -2,7 +2,7 @@
 
 A real-time, end-to-end solution for validating, processing, and visualizing IoT data streams. This project leverages a modern tech stack including MQTT, FastAPI, Pandera, InfluxDB, Prometheus, and Grafana to create a robust and highly configurable data pipeline.
 
-## 📖 Overview 
+## 📖 Overview
 
 This project provides a complete ecosystem that captures raw MQTT messages, validates them against dynamic, user-defined schemas, and routes them for persistent storage and real-time visualization.
 
@@ -330,7 +330,7 @@ The editor has two modes, allowing both technical and non-technical users to man
     -   For each column, you can add multiple `Checks` to enforce specific rules (e.g., `in_range`, `greater_than`, `str_matches` for regex).
 -   **Raw Text (JSON) Editor**: For advanced users, this mode allows you to view, edit, or paste the schema definition as a raw, strict JSON object. The system automatically syncs the content between the Visual and Raw editors.
 
-**How it Works (The Magic of Dynamic Configuration):**
+**How it Works (The Dynamic Configuration):**
 When you save any change in the Admin Panel (be it MQTT settings, mappings, or a schema), the following happens in sequence:
 1.  The frontend sends the updated configuration to the backend API.
 2.  The backend (`main.py`) persists the changes to the appropriate file (`config.json` or a file in `schemas/`).
@@ -593,12 +593,8 @@ This project provides a robust foundation for a real-time data validation pipeli
     -   **Integration with `DataFrameModel`**: Allowing developers to define schemas as Python classes that inherit from `pa.DataFrameModel`. This provides the benefits of static type checking and IDE auto-completion for schema definitions.
     -   **Decorator-Based Validation**: Integrating with Pandera's function decorators (`@pa.check_input`, `@pa.check_output`) for schema enforcement directly at the function level within the application code.
 
--   **Integration with Real-World Data Streams**: While the provided simulators are effective for testing, a future milestone would involve integrating and testing the pipeline with data from actual physical sensors to validate its performance and resilience under real-world conditions. 
+-   **Integration with Real-World Data Streams**: While the provided simulators are effective for testing, a future milestone would involve integrating and testing the pipeline with data from actual physical sensors to validate its performance and resilience under real-world conditions.
 
--   **Asynchronous Data Persistence**: The current data writing operation to InfluxDB is synchronous, which means the MQTT message processing loop waits for the database to confirm the write before moving to the next message. Under high data volumes, this can become a significant bottleneck, as database latency directly impacts the overall message ingestion rate. A future enhancement would be to implement asynchronous or batch writing to InfluxDB, decoupling the processing loop from I/O wait times and significantly improving throughput.
-
--   **Scalable Message Processing Architecture**: The system's core logic currently relies on a single-threaded message processing loop within the MQTT client. This creates a natural bottleneck under high traffic, as messages can only be validated and routed sequentially. To handle a much larger scale, the architecture could be evolved to use an asynchronous processing model or a producer-consumer pattern with a message queue (like RabbitMQ or Redis) and multiple parallel workers, allowing for concurrent message processing.
-
--  **AI-Powered Schema and Anomaly Detection**: A forward-looking enhancement could involve integrating machine learning models to analyze incoming data streams. This could enable advanced features such as:
+-   **AI-Powered Schema and Anomaly Detection**: A forward-looking enhancement could involve integrating machine learning models to analyze incoming data streams. This could enable advanced features such as:
     -   **Automatic Schema Inference**: Generating a baseline Pandera schema by analyzing a sample of the data.
     -   **Dynamic Anomaly Detection**: Automatically adjusting alarm thresholds in Grafana based on learned normal operating behaviors, moving from static thresholds to dynamic anomaly detection. 
