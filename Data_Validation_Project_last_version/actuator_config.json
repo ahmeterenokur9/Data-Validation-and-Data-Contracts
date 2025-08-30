@@ -1,0 +1,15 @@
+{
+  "actuator_mappings": [
+    {
+      "actuator_id": "smart_lamp",
+      "command_topic": "commands/actuator/smart_lamp/set",
+      "command_validated_topic": "commands/actuator/smart_lamp/set/validated",
+      "command_failed_topic": "commands/actuator/smart_lamp/set/failed",
+      "status_topic": "status/actuator/smart_lamp/get",
+      "status_validated_topic": "status/actuator/smart_lamp/get/validated",
+      "status_failed_topic": "status/actuator/smart_lamp/get/failed",
+      "command_schema": "schemas/actuators/actuator_smart_lamp_command.json",
+      "status_schema": "schemas/actuators/actuator_smart_lamp_status.json"
+    }
+  ]
+}

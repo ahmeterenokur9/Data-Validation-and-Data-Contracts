@@ -1,0 +1,38 @@
+{
+    "columns": {
+        "sensor_id": {
+            "dtype": "str",
+            "nullable": false,
+            "unique": false,
+            "checks": {
+                "equal_to": "sensor4"
+            }
+        },
+        "timestamp": {
+            "dtype": "datetime",
+            "nullable": false,
+            "unique": false
+        },
+        "radiation_level": {
+            "dtype": "float",
+            "nullable": false,
+            "unique": false,
+            "checks": {
+                "less_than": 100,
+                "greater_than": 0
+            }
+        },
+        "soil_temperature": {
+            "dtype": "float",
+            "nullable": false,
+            "unique": false,
+            "checks": {
+                "greater_than": -5,
+                "less_than": 25
+            }
+        }
+    },
+    "strict": true,
+    "ordered": false,
+    "coerce": true
+}

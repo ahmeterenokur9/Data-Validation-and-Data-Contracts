@@ -1,0 +1,35 @@
+{
+    "columns": {
+        "command": {
+            "dtype": "str",
+            "nullable": false,
+            "unique": false,
+            "checks": {
+                "isin": [
+                    "on",
+                    "off",
+                    "white",
+                    "red",
+                    "green",
+                    "blue"
+                ]
+            }
+        },
+        "room": {
+            "dtype": "str",
+            "nullable": false,
+            "unique": false,
+            "checks": {
+                "isin": [
+                    "living_room",
+                    "kitchen",
+                    "bedroom",
+                    "bathroom"
+                ]
+            }
+        }
+    },
+    "strict": true,
+    "ordered": false,
+    "coerce": true
+}

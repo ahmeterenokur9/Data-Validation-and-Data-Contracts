@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Validator - Actuator Admin</title>
+    <link rel="stylesheet" href="/static/admin.css?v=1.2">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="ph ph-wrench"></i> Actuator Admin Panel</h1>
+
+        <!-- MQTT Configuration -->
+        <div class="card">
+            <h2><i class="ph ph-broadcast"></i> MQTT Configuration</h2>
+            <form id="mqtt-config-form">
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div><label for="broker">Broker URL</label><input type="text" id="broker"></div>
+                    <div><label for="port">Port</label><input type="number" id="port"></div>
+                </div>
+                <hr>
+                <h3>Topic Mappings</h3>
+                <div id="mappings-list"></div>
+                <button type="button" id="add-mapping-btn" class="add-btn"><i class="ph ph-plus"></i> Add New Mapping</button>
+                <hr>
+                <button type="submit" id="save-config-btn">Save Configuration</button>
+            </form>
+            <p id="config-status" class="status-message hidden"></p>
+        </div>
+
+        <!-- Schema File Editor -->
+        <div class="card">
+            <h2><i class="ph ph-scroll"></i> Schema File Editor</h2>
+            <div class="schema-layout">
+                <div class="schema-list-container">
+                    <h3>Available Schemas</h3>
+                    <table id="schemas-table">
+                        <thead><tr><th>Filename</th><th>Action</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                    <button type="button" id="new-schema-btn" class="add-btn" style="margin-top: 16px;"><i class="ph ph-plus"></i> Create New</button>
+                </div>
+                <div class="schema-editor-container" id="schema-editor-container">
+                    <h3 id="editor-title">Schema Editor</h3>
+
+                    <div class="editor-toggle">
+                        <button id="visual-editor-btn" class="toggle-btn active" type="button">Visual Editor</button>
+                        <button id="raw-editor-btn" class="toggle-btn" type="button">Raw Text (JSON)</button>
+                    </div>
+
+                    <form id="schema-editor-form">
+                        <div class="form-group">
+                            <label for="schema-filename">Filename</label>
+                            <input type="text" id="schema-filename" required placeholder="new-schema.json">
+                        </div>
+
+                        <!-- Visual Editor Content -->
+                        <div id="visual-editor">
+                            <!-- General Schema Settings -->
+                            <div class="schema-settings">
+                                <h4>General Schema Settings</h4>
+                                <div class="form-group inline">
+                                    <input type="checkbox" id="schema-strict">
+                                    <label for="schema-strict">Strict Mode (No extra columns allowed)</label>
+                                </div>
+                                <div class="form-group inline">
+                                    <input type="checkbox" id="schema-ordered">
+                                    <label for="schema-ordered">Ordered (Columns must be in schema order)</label>
+                                </div>
+                                <div class="form-group inline">
+                                    <input type="checkbox" id="schema-coerce">
+                                    <label for="schema-coerce">Coerce Types (Attempt to convert types)</label>
+                                </div>
+                            </div>
+
+                            <!-- Columns Container -->
+                            <h4>Columns</h4>
+                            <div id="columns-container"></div>
+                            <button type="button" id="add-column-btn" class="add-btn"><i class="ph ph-plus-circle"></i> Add Column</button>
+                        </div>
+
+                        <!-- Raw Text Editor Content -->
+                        <div id="raw-editor" style="display: none;">
+                             <div class="form-group">
+                                <label for="schema-content-raw">Content (JSON format)</label>
+                                <textarea id="schema-content-raw" rows="15" placeholder="Enter schema as strict JSON..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <hr>
+
+                        <div class="form-actions">
+                            <button type="submit" id="save-schema-btn" class="save-btn">Save Schema</button>
+                            <button type="button" id="cancel-edit-btn" class="delete-btn">Cancel</button>
+                        </div>
+                    </form>
+                    <p id="schema-status" class="status-message hidden"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template for a new column -->
+    <template id="column-template">
+        <div class="column-card">
+            <div class="column-header">
+                <input type="text" class="column-name" placeholder="Column Name" required>
+                <button type="button" class="delete-btn delete-column-btn"><i class="ph ph-trash"></i></button>
+            </div>
+            <div class="column-body">
+                <div class="form-group">
+                    <label>Data Type</label>
+                    <select class="column-dtype">
+                        <option value="str">String</option>
+                        <option value="int">Integer</option>
+                        <option value="float">Float</option>
+                        <option value="bool">Boolean</option>
+                        <option value="datetime">DateTime</option>
+                    </select>
+                </div>
+                <div class="form-group inline">
+                    <input type="checkbox" class="column-nullable">
+                    <label>Nullable (Can be empty)</label>
+                </div>
+                <div class="form-group inline">
+                    <input type="checkbox" class="column-unique">
+                    <label>Unique</label>
+                </div>
+                <div class="column-checks-wrapper">
+                    <h5>Checks</h5>
+                    <div class="checks-container">
+                        <!-- Checks will be dynamically added here -->
+                    </div>
+                    <button type="button" class="add-btn add-check-btn"><i class="ph ph-plus"></i> Add Check</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template for a new check -->
+    <template id="check-template">
+        <div class="check-item">
+            <select class="check-type">
+                <optgroup label="Common">
+                    <option value="isin">isin (in list)</option>
+                    <option value="notin">notin (not in list)</option>
+                    <option value="equal_to">equal_to</option>
+                    <option value="not_equal_to">not_equal_to</option>
+                </optgroup>
+                <optgroup label="Numeric">
+                    <option value="greater_than">greater_than</option>
+                    <option value="less_than">less_than</option>
+                    <option value="greater_than_or_equal_to">greater_than_or_equal_to</option>
+                    <option value="less_than_or_equal_to">less_than_or_equal_to</option>
+                    <option value="in_range">in_range</option>
+                </optgroup>
+                <optgroup label="String">
+                    <option value="str_matches">str_matches (Regex)</option>
+                    <option value="str_contains">str_contains</option>
+                    <option value="str_starts_with">str_starts_with</option>
+                    <option value="str_ends_with">str_ends_with</option>
+                    <option value="str_length">str_length</option>
+                </optgroup>
+            </select>
+            <input type="text" class="check-value" placeholder='Value or ["on","off"] or [0,100]'>
+            <button type="button" class="delete-btn delete-check-btn"><i class="ph ph-x"></i></button>
+        </div>
+    </template>
+
+    <script src="/static/actuator_admin.js?v=1.3"></script>
+</body>
+</html>

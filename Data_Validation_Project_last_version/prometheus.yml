@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 1s # By default, scrape targets every 15 seconds.
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'fastapi_app_metrics'
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+      # This is the target to scrape. We use the service name defined in docker-compose.yml,
+      # and Docker's internal DNS will resolve it to the correct container IP.
+      - targets: ['fastapi_app:8000'] 

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Actuator Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Phosphor Icons for modern icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- MQTT.js Library -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        .message-card.validated-command .card-header {
+            background-color: #e6f7ff; /* Light blue */
+            border-bottom: 1px solid #91d5ff;
+        }
+        .message-card.validated-status .card-header {
+            background-color: #f6ffed; /* Light green */
+            border-bottom: 1px solid #b7eb8f;
+        }
+        .message-card.validated-command .card-topic .ph-lightning { color: #096dd9; }
+        .message-card.validated-status .card-topic .ph-gauge { color: #389e0d; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1><i class="ph-bold ph-game-controller"></i> MQTT Actuator Dashboard</h1>
+            <div class="connection-status" id="connection-status">
+                <span class="status-light"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <aside class="filter-sidebar">
+            <div class="sidebar-section">
+                <h2><i class="ph-bold ph-chart-bar"></i> Dashboard Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-count">0</span>
+                        <span class="stat-label">Total Msgs</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="validated-count">0</span>
+                        <span class="stat-label">Validated</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="failed-count">0</span>
+                        <span class="stat-label">Failed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h2><i class="ph-bold ph-funnel-simple"></i> Filters</h2>
+                <div class="filter-group">
+                    <h3>Source Topics</h3>
+                    <div class="checkbox-group" id="source-topic-filter">
+                        <!-- Topics will be dynamically populated here -->
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3>Message Status</h3>
+                    <div class="checkbox-group" id="status-filter">
+                        <label><input type="checkbox" value="validated" checked> <i class="ph ph-check-circle"></i> Validated</label>
+                        <label><input type="checkbox" value="failed" checked> <i class="ph ph-x-circle"></i> Failed</label>
+                    </div>
+                </div>
+                <div class="filter-group" id="error-type-filter-group">
+                    <h3>Error Type</h3>
+                    <div class="checkbox-group" id="error-type-filter">
+                        <label><input type="checkbox" value="missing_field" checked> Missing Field</label>
+                        <label><input type="checkbox" value="extra_field" checked> Extra Field</label>
+                        <label><input type="checkbox" value="wrong_type" checked> Wrong Type</label>
+                        <label><input type="checkbox" value="out_of_range" checked> Out of Range</label>
+                        <label><input type="checkbox" value="null_value" checked> Null Value</label>
+                        <label><input type="checkbox" value="mismatched_id" checked> Mismatched ID</label>
+                        <label><input type="checkbox" value="bad_format" checked> Bad Format</label>
+                        <label><input type="checkbox" value="unexpected_error" checked> Unexpected Error</label>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <button id="clear-log-btn"><i class="ph ph-trash"></i> Clear Log</button>
+            </div>
+        </aside>
+
+        <main class="message-log" id="message-log">
+            <!-- Messages will be dynamically added here -->
+            <div class="log-placeholder">
+                <i class="ph ph-info"></i>
+                <p>Waiting for actuator data...</p>
+                <span>Connecting to the MQTT broker, please wait.</span>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/actuator_app.js?v=1.2"></script>
+</body>
+</html>

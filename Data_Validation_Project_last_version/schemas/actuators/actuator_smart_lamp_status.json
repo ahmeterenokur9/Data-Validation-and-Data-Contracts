@@ -1,0 +1,44 @@
+{
+    "columns": {
+        "status": {
+            "dtype": "str",
+            "nullable": false,
+            "unique": false,
+            "checks": {
+                "isin": [
+                    "off",
+                    "white",
+                    "red",
+                    "green",
+                    "blue"
+                ]
+            }
+        },
+        "actuator_id": {
+            "dtype": "str",
+            "nullable": false,
+            "unique": false
+        },
+        "room": {
+            "dtype": "str",
+            "nullable": false,
+            "unique": false,
+            "checks": {
+                "isin": [
+                    "living_room",
+                    "kitchen",
+                    "bedroom",
+                    "bathroom"
+                ]
+            }
+        },
+        "timestamp": {
+            "dtype": "datetime",
+            "nullable": false,
+            "unique": false
+        }
+    },
+    "strict": true,
+    "ordered": false,
+    "coerce": true
+}
